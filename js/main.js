@@ -286,7 +286,7 @@ class Hero extends Alive{
 ////SCENE
 
 //LOAD DATA
-TEXTURE_LIST["background"] = new Texture(DATA_PATH + "background.png")
+TEXTURE_LIST["background"] = new Texture(DATA_PATH + "background_forest_1.png")
 
 TEXTURE_LIST["hero_stay"] = new AnimationTexture(DATA_PATH + "hero_stay.png")
 TEXTURE_LIST["hero_fall"] = new AnimationTexture(DATA_PATH + "hero_fall.png")
