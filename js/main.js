@@ -10,8 +10,9 @@ var canvas = document.getElementById("viewport")
 var ctx = canvas.getContext('2d')
 
 //CONSTANTS
-//paths
+//other
 const DATA_PATH = "resources/"
+const DEBUG = true
 
 //arrays
 const PRESSED_KEYS = new Array(128)
@@ -109,14 +110,15 @@ class Texture{
   }
 }
 class AnimationTexture extends Texture{
-  constructor(path,n=1,fspeed=20){
+  constructor(path,n=1,fspeed=10){
 		super(path)
 
     this.frames = n
     this.frameSpeed = fspeed
+		this.frameWidth = 1
 
     this.data.onload = ()=>{
-			console.log("huh")
+			console.log("huh",path,this)
     	this.frameWidth = Math.floor(this.data.width / n)
     }
   }
@@ -192,7 +194,7 @@ class ASprite extends Sprite{
   }
   draw(){
     ctx.drawImage(this.texture.data,
-                  Math.floor(this.frameStatus/this.frameSpeed)*this.texture.frameWidth,
+                  Math.floor(this.frameStatus/this.texture.frameSpeed)*this.texture.frameWidth,
                   0,
                   this.texture.frameWidth,
                   this.texture.data.height,
@@ -202,7 +204,7 @@ class ASprite extends Sprite{
 									this.height)
   }
   update(dt){
-    this.frameStatus = (this.frameStatus+dt)%(this.texture.frames*this.frameSpeed)
+    this.frameStatus = (this.frameStatus+dt*100)%(this.texture.frames*this.texture.frameSpeed)
   }
 }
 
@@ -228,17 +230,8 @@ class Alive extends Entity{
   draw(){
       switch(this.entityState){
         case ANIMATION_STATE_STAY:
-					console.log(	this.animation_stay.data,
-                        this.animation_stay.frameWidth*(this.direction*0.5-0.5),//+ Math.floor(this.frameStatus/this.frameSpeed)*this.animation_stay.frameWidth,
-                        0,
-                        (this.direction) * this.animation_stay.frameWidth,
-                        (this.direction) * this.animation_stay.data.height,
-												this.x,
-												this.y,
-												this.width,
-												this.height)//*/
           ctx.drawImage(this.animation_stay.data,
-                        this.animation_stay.frameWidth*(this.direction*0.5-0.5) + Math.floor(this.frameStatus/this.frameSpeed)*this.animation_stay.frameWidth,
+                        this.animation_stay.frameWidth*(this.direction*0.5-0.5) + Math.floor(this.frameStatus/this.animation_stay.frameSpeed)*this.animation_stay.frameWidth,
                         0,
                         (this.direction) * this.animation_stay.frameWidth,
                         (this.direction) * this.animation_stay.data.height,
@@ -249,7 +242,7 @@ class Alive extends Entity{
           break
         case ANIMATION_STATE_FALL:
           ctx.drawImage(this.animation_fall.data,
-                        this.animation_fall.frameWidth*(this.direction*0.5-0.5) + Math.floor(this.frameStatus/this.frameSpeed)*this.animation_fall.frameWidth,
+                        this.animation_fall.frameWidth*(this.direction*0.5-0.5) + Math.floor(this.frameStatus/this.animation_fall.frameSpeed)*this.animation_fall.frameWidth,
                         0,
                         (this.direction) * this.animation_fall.frameWidth,
                         (this.direction) * this.animation_fall.data.height,
@@ -260,7 +253,7 @@ class Alive extends Entity{
           break
         case ANIMATION_STATE_RUN:
           ctx.drawImage(this.animation_run.data,
-                        this.animation_run.frameWidth*(this.direction*0.5-0.5) + Math.floor(this.frameStatus/this.frameSpeed)*this.animation_run.frameWidth,
+                        this.animation_run.frameWidth*(this.direction*0.5-0.5) + Math.floor(this.frameStatus/this.animation_run.frameSpeed)*this.animation_run.frameWidth,
                         0,
                         (this.direction) * this.animation_run.frameWidth,
                         (this.direction) * this.animation_run.data.height,
@@ -271,7 +264,7 @@ class Alive extends Entity{
           break
         case ANIMATION_STATE_JUMP:
           ctx.drawImage(this.animation_jump.data,
-                        this.animation_jump.frameWidth*(this.direction*0.5-0.5) + Math.floor(this.frameStatus/this.frameSpeed)*this.animation_jump.frameWidth,
+                        this.animation_jump.frameWidth*(this.direction*0.5-0.5) + Math.floor(this.frameStatus/this.animation_jump.frameSpeed)*this.animation_jump.frameWidth,
                         0,
                         (this.direction) * this.animation_jump.frameWidth,
                         (this.direction) * this.animation_jump.data.height,
@@ -285,24 +278,27 @@ class Alive extends Entity{
 
     update = function(dt){
 			switch(this.entityState){
-				case ANIMATION_STATE_STAY:
-      		this.frameStatus = (this.frameStatus+dt)%(this.animation_stay.frames*this.frameSpeed)
-					break
-				case ANIMATION_STATE_FALL:
-      		this.frameStatus = (this.frameStatus+dt)%(this.animation_fall.frames*this.frameSpeed)
-					break
-				case ANIMATION_STATE_RUN:
-      		this.frameStatus = (this.frameStatus+dt)%(this.animation_run.frames*this.frameSpeed)
-					break
-				case ANIMATION_STATE_JUMP:
-      		this.frameStatus = (this.frameStatus+dt)%(this.animation_jump.frames*this.frameSpeed)
-					break
-			}
+					case ANIMATION_STATE_STAY:
+	      		this.frameStatus = (this.frameStatus+dt*100)%(this.animation_stay.frames*this.animation_stay.frameSpeed)
+						break
+					case ANIMATION_STATE_FALL:
+	      		this.frameStatus = (this.frameStatus+dt*100)%(this.animation_fall.frames*this.animation_fall.frameSpeed)
+						break
+					case ANIMATION_STATE_RUN:
+	      		this.frameStatus = (this.frameStatus+dt*100)%(this.animation_run.frames*this.animation_run.frameSpeed)
+						break
+					case ANIMATION_STATE_JUMP:
+	      		this.frameStatus = (this.frameStatus+dt*100)%(this.animation_jump.frames*this.animation_jump.frameSpeed)
+						break
+	    }
     }
 }
 
 
 class Hero extends Alive{
+	constructor(x=0,y=0,w=0,h=0,source_path=""){
+    super(x,y,w,h,source_path)
+  }
   update = function(dt){
     var newFlag = false
 		var runFlag = false
@@ -311,15 +307,15 @@ class Hero extends Alive{
     //ХОДИТ
 		if( PRESSED_KEYS[ KEY_LEFT ] || PRESSED_KEYS[ KEY_A ] ) {
 			runFlag = true
-			this.speedX = -10
+			this.speedX = -100
 			this.x += this.speedX * dt
-      this.direction = 1
+      this.direction = -1
 		}
 		if( PRESSED_KEYS[ KEY_RIGHT ] || PRESSED_KEYS[ KEY_D ] ) {
 			runFlag = true
-			this.speedX = 10
+			this.speedX = 100
       this.x += this.speedX * dt
-      this.direction = -1
+      this.direction = 1
 		}
 
       //Физика прыжжка
@@ -327,20 +323,20 @@ class Hero extends Alive{
 			this.speedY = 100
 			this.onFloor -= 1
 		}
-		this.speedY = this.speedY - dt*9.8
-		this.y += this.speedY * dt
+		//this.speedY = this.speedY - dt*9.8
+		this.y -= this.speedY * dt
 
 		for(let i=0;i<LIFELESSES.length;i++){
 			LIFELESSES.collide(this)
 		}
 
-		if(speedY>0){
+		if(this.speedY>0){
 			if(this.entityState != ANIMATION_STATE_FALL){
 				newFlag = true
 				this.entityState = ANIMATION_STATE_FALL
 			}
 		}
-		else if(speedY<0){
+		else if(this.speedY<0){
 			if(this.entityState != ANIMATION_STATE_JUMP){
 				newFlag = true
 				this.entityState = ANIMATION_STATE_JUMP
@@ -350,9 +346,27 @@ class Hero extends Alive{
 				newFlag = true
         this.entityState = ANIMATION_STATE_RUN
 			}
+		}else{
+			if(this.entityState != ANIMATION_STATE_STAY){
+				newFlag = true
+        this.entityState = ANIMATION_STATE_STAY
+			}
 		}
     if(newFlag) this.frameStatus=0;
-    else this.frameStatus = (this.frameStatus+dt)%(this.texture.frames*this.frameSpeed)
+    else switch(this.entityState){
+				case ANIMATION_STATE_STAY:
+      		this.frameStatus = (this.frameStatus+dt*100)%(this.animation_stay.frames*this.animation_stay.frameSpeed)
+					break
+				case ANIMATION_STATE_FALL:
+      		this.frameStatus = (this.frameStatus+dt*100)%(this.animation_fall.frames*this.animation_fall.frameSpeed)
+					break
+				case ANIMATION_STATE_RUN:
+      		this.frameStatus = (this.frameStatus+dt*100)%(this.animation_run.frames*this.animation_run.frameSpeed)
+					break
+				case ANIMATION_STATE_JUMP:
+      		this.frameStatus = (this.frameStatus+dt*100)%(this.animation_jump.frames*this.animation_jump.frameSpeed)
+					break
+    }
 	}
 }
 
@@ -374,10 +388,14 @@ while(true){
 		break
 }
 console.log('load end')
-//GAME INIT START
-var lastTime;
 
-var hero = new Alive(100,100,300,300,"dwarf")
+//GAME INIT START
+ctx.fillStyle = "#000"
+canvas.style.width = window.innerWidth
+canvas.style.height = window.innerHeight
+
+var lastTime = Date.now()
+var hero = new Hero(100,100,300,300,"dwarf")
 LIFELESSES[0] = new Sprite(0,200,800,600,"ground")
 BACKGROUNDS[0] = new Sprite(0,0,800,600,"background")
 
@@ -396,17 +414,25 @@ function update(dt){
 
 
 function render(){
-
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
   //background
-  BACKGROUNDS[0].draw()
+	BACKGROUNDS[0].draw()
   for(let i=1;i<BACKGROUNDS.length;i++)BACKGROUNDS[i].draw()
 
   //other entity
   for(let i=0;i<LIFELESSES.length;i++)LIFELESSES[i].draw()
   for(let i=0;i<ALIVES.length;i++)ALIVES[i].draw()
-	
+
 	//hero
 	hero.draw()
+
+	if(DEBUG){
+		ctx.fillStyle = "yellow"
+		ctx.fillText(hero.entityState+" "+hero.frameStatus,100,100)
+		ctx.fillText(hero.x,100,130)
+		ctx.fillText(hero.y,100,160)
+		ctx.fillStyle = "black"
+	}
 }
 
 
@@ -421,5 +447,6 @@ function frame(){
 
 	c++
 	lastTime = now
-	if(c<10)requestAnimationFrame(frame)
+//	if(c<10)
+	requestAnimationFrame(frame)
 }
