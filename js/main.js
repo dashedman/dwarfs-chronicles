@@ -10,19 +10,31 @@ var canvas = document.getElementById("viewport")
 var ctx = canvas.getContext('2d')
 
 //CONSTANTS
+//paths
 const DATA_PATH = "resources/"
 
+//arrays
 const PRESSED_KEYS = new Array(128)
 const LIFELESSES = {}
 const BACKGROUNDS = {}
 const ALIVES = {}
 const TEXTURE_LIST = {}
 
+//animation states
 const ANIMATION_STATE_STAY=0
 const ANIMATION_STATE_FALL=1
 const ANIMATION_STATE_RUN=2
 const ANIMATION_STATE_JUMP=3
 
+//block types
+const TYPE_BOX = 0
+const TYPE_CIRCLE = 1
+const TYPE_TRIANGLE_LEFT_UP = 2
+const TYPE_TRIANGLE_RIGHT_UP = 3
+const TYPE_TRIANGLE_RIGHT_DOWN = 4
+const TYPE_TRIANGLE_LEFT_DOWN = 5
+
+//keycodes
 const KEY_SPACE = 32
 const KEY_LEFT = 37
 const KEY_UP = 38
@@ -98,21 +110,53 @@ class AnimationTexture extends Texture{
 
 
 class Entity{
-  constructor(x=0,y=0,w=0,h=0){
+  constructor(x=0,y=0,w=0,h=0,type=0){
     this.x = x
     this.y = y
     this.width = w
     this.height = h
+
+		this.type = type
   }
+	collide(obj){
+		switch(this.type){
+			case TYPE_BOX:
+				switch (obj.type) {
+					case TYPE_BOX:
+						//collision flag
+						if(obj.x+obj.width < this.x ||
+							obj.x > this.x+this.width ||
+							obj.y+obj.height < this.y ||
+							obj.y > this.y+this.height)return;
+
+						//collision reaction
+						if(obj.speedX>0){
+							obj.x = this.x-obj.width
+						}else if(obj.speedX<0){
+							obj.x = this.x+this.width
+						}
+
+						if(obj.speedY<0){
+							obj.y = this.y+this.height
+							obj.speedY = 0
+						}else if(obj.speedY>0){
+							obj.speedY = 0
+							obj.y = this.y - obj.height
+							obj.onFloor = 1
+						}
+						break
+				}
+				break
+		}
+	}
 }
 
 
 class Sprite extends Entity{
-  constructor(x=0,y=0,w=0,h=0,source_path=""){
-    super(x,y,w,h)
+  constructor(x=0,y=0,w=0,h=0,source_path="",type=0){
+    super(x,y,w,h,type)
     this.texture = TEXTURE_LIST[source_path]
   }
-
   draw(){
     ctx.drawImage(this.texture.data, \
                   this.x, \
@@ -126,12 +170,10 @@ class Sprite extends Entity{
   }
   update(dt){}
 }
-class ASprite extends Entity{
-  constructor(x=0,y=0,w=0,h=0,source_path=""){
-    super(x,y,w,h)
+class ASprite extends Sprite{
+  constructor(x=0,y=0,w=0,h=0,source_path="",type=0){
+    super(x,y,w,h,source_path="",type)
     this.frameStatus = 0
-
-    this.atexture = TEXTURE_LIST[source_path]
   }
   draw(){
     ctx.drawImage(this.texture.data, \
@@ -157,7 +199,7 @@ class Alive extends Entity{
     this.speedY = 0
 		this.accelerationX = 10
     this.direction = false
-		this.onfloor = 0
+		this.onFloor = 0
 
     this.entityState = 0
     this.frameStatus = 0
@@ -227,42 +269,46 @@ class Hero extends Alive{
   update = function(dt){
     var newFlag = false
 		var runFlag = false
+		var fallFlag = false
+
     //ХОДИТ
 		if( PRESSED_KEYS[ KEY_LEFT ] || PRESSED_KEYS[ KEY_A ] ) {
 			runFlag = true
 			this.speedX = -10
 			this.x += this.speedX * dt
       this.direction = false
-
-			if(this.entityState != ANIMATION_STATE_RUN){
-				newFlag = true
-        this.entityState = ANIMATION_STATE_RUN
-			}
 		}
 		if( PRESSED_KEYS[ KEY_RIGHT ] || PRESSED_KEYS[ KEY_D ] ) {
 			runFlag = true
 			this.speedX = 10
       this.x += this.speedX * dt
       this.direction = true
-
-      if(this.entityState != ANIMATION_STATE_RUN){
-				newFlag = true
-        this.entityState = ANIMATION_STATE_RUN
-			}
 		}
-
 
       //Физика прыжжка
 		if( PRESSED_KEYS[KEY_SPACE] && this.onFloor){
 			this.speedY = 100
 			this.onFloor -= 1
-
 		}
-		this.y += this.speedY * dt ;
 		this.speedY = this.speedY - dt*9.8
+		this.y += this.speedY * dt
 
+		for(let i=0;i<LIFELESSES.length;i++){
+			LIFELESSES.collide(this)
+		}
 
-
+		if(fallFlag){
+			if(this.entityState != ANIMATION_STATE_FALL){
+				newFlag = true
+				this.entityState = ANIMATION_STATE_FALL
+			}
+		}
+		else if(runFlag){
+			if(this.entityState != ANIMATION_STATE_RUN){
+				newFlag = true
+        this.entityState = ANIMATION_STATE_RUN
+			}
+		}
     if(newFlag) this.frameStatus=0;
     else this.frameStatus = (this.frameStatus+dt)%(this.texture.frames*this.frameSpeed)
 
@@ -273,6 +319,7 @@ class Hero extends Alive{
 
 //LOAD DATA
 TEXTURE_LIST["background"] = new Texture(DATA_PATH + "background_forest_1.png")
+TEXTURE_LIST["ground_forest_1"] = new Texture(DATA_PATH + "ground_forest_1.png")
 
 TEXTURE_LIST["dwarf_stay"] = new AnimationTexture(DATA_PATH + "dwarf_stay.png")
 TEXTURE_LIST["dwarf_fall"] = new AnimationTexture(DATA_PATH + "dwarf_stay.png")
@@ -285,6 +332,7 @@ var gameTime = 0;
 var lastTime;
 
 var hero = new Alive(0,0,300,300,"dwarf")
+LIFELESSES[0] = new Sprite(0,200,800,600,"ground_forest_1")
 BACKGROUNDS[0] = new Sprite(0,0,800,600,"background")
 
 
