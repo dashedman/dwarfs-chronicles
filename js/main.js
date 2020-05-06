@@ -391,6 +391,7 @@ console.log('load end')
 
 //GAME INIT START
 ctx.fillStyle = "#000"
+ctx.imageSmoothingEnabled = false
 canvas.style.width = window.innerWidth
 canvas.style.height = window.innerHeight
 
