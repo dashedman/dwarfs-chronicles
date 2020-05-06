@@ -228,7 +228,7 @@ class Alive extends Entity{
   draw(){
       switch(this.entityState){
         case ANIMATION_STATE_STAY:
-					console.log(
+					console.log(	this.animation_stay.data,
                         this.animation_stay.frameWidth*(this.direction*0.5-0.5),//+ Math.floor(this.frameStatus/this.frameSpeed)*this.animation_stay.frameWidth,
                         0,
                         (this.direction) * this.animation_stay.frameWidth,
@@ -401,18 +401,17 @@ function render(){
   BACKGROUNDS[0].draw()
   for(let i=1;i<BACKGROUNDS.length;i++)BACKGROUNDS[i].draw()
 
-  //hero
-  hero.draw()
-
   //other entity
-//  for(let i=0;i<LIFELESSES.length;i++)LIFELESSES[i].draw()
-//  for(let i=0;i<ALIVES.length;i++)ALIVES[i].draw()
-
+  for(let i=0;i<LIFELESSES.length;i++)LIFELESSES[i].draw()
+  for(let i=0;i<ALIVES.length;i++)ALIVES[i].draw()
+	
+	//hero
+	hero.draw()
 }
 
 
 
-
+var c=0
 function frame(){
 	let now = Date.now()
 	let dt = (now - lastTime)/1000
@@ -420,6 +419,7 @@ function frame(){
 	update(dt)
 	render()
 
+	c++
 	lastTime = now
-	requestAnimationFrame(frame)
+	if(c<10)requestAnimationFrame(frame)
 }
