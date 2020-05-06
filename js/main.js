@@ -153,9 +153,11 @@ class ASprite extends Entity{
 class Alive extends Entity{
   constructor(x=0,y=0,w=0,h=0,source_path=""){
     super(x,y,w,h)
-    this.speedX = 10
-    this.speedY = 100
+    this.speedX = 0
+    this.speedY = 0
+		this.accelerationX = 10
     this.direction = false
+		this.onfloor = 0
 
     this.entityState = 0
     this.frameStatus = 0
@@ -223,63 +225,47 @@ class Alive extends Entity{
 
 class Hero extends Alive{
   update = function(dt){
-    let newFlag = false
-
+    var newFlag = false
+		var runFlag = false
     //ХОДИТ
 		if( PRESSED_KEYS[ KEY_LEFT ] || PRESSED_KEYS[ KEY_A ] ) {
-			this.x -= this.dx * dt
+			runFlag = true
+			this.speedX = -10
+			this.x += this.speedX * dt
       this.direction = false
 
 			if(this.entityState != ANIMATION_STATE_RUN){
-				let newFlag = true
+				newFlag = true
         this.entityState = ANIMATION_STATE_RUN
 			}
 		}
-
 		if( PRESSED_KEYS[ KEY_RIGHT ] || PRESSED_KEYS[ KEY_D ] ) {
-      this.x += this.dx * dt
+			runFlag = true
+			this.speedX = 10
+      this.x += this.speedX * dt
       this.direction = true
 
       if(this.entityState != ANIMATION_STATE_RUN){
-				let newFlag = true
+				newFlag = true
         this.entityState = ANIMATION_STATE_RUN
 			}
 		}
 
 
-  	if(Math.round(fallanim) > 2 && (jump || person.y >= 460)){             //Физика прыжжка
-  		if(isDown('SPACE') || isDown('UP') || isDown('w')){
-  			person.y -= person.dy * dt;
-  			jump += speedparam.jump * dt;
-  		}
-  		if(jump > 10){
-  			jump = 0;
-  		}
-  	}
-  	if(!isDown('SPACE') && !isDown('UP') && !isDown('w')){
-  		jump = 0;
-  	}
+      //Физика прыжжка
+		if( PRESSED_KEYS[KEY_SPACE] && this.onFloor){
+			this.speedY = 100
+			this.onFloor -= 1
 
-  	pressedKeyscheck = false;
-  	for(i in pressedKeys){
-  		if(pressedKeys[i] == true){
-  			pressedKeyscheck = true; //true -- в движении
-  		}
-  	}
-  	if(!pressedKeyscheck){			//Стоит на месте
-  		standanim += speedparam.stand * dt;
-  	}
-  	if(person.y < 460 && !jump){	//Падение
-  		person.y += person.dy * dt;
-  		fallanim = 0;
-  	}
-  	if(Math.round(fallanim) < 3){		//Приземление
-  		fallanim += speedparam.fall * dt;
-  	}
+		}
+		this.y += this.speedY * dt ;
+		this.speedY = this.speedY - dt*9.8
+
+
 
     if(newFlag) this.frameStatus=0;
     else this.frameStatus = (this.frameStatus+dt)%(this.texture.frames*this.frameSpeed)
-  }
+
 }
 
 
@@ -288,17 +274,17 @@ class Hero extends Alive{
 //LOAD DATA
 TEXTURE_LIST["background"] = new Texture(DATA_PATH + "background_forest_1.png")
 
-TEXTURE_LIST["hero_stay"] = new AnimationTexture(DATA_PATH + "hero_stay.png")
-TEXTURE_LIST["hero_fall"] = new AnimationTexture(DATA_PATH + "hero_fall.png")
-TEXTURE_LIST["hero_run"] = new AnimationTexture(DATA_PATH + "hero_run.png")
-TEXTURE_LIST["hero_jump"] = new AnimationTexture(DATA_PATH + "hero_jump.png")
+TEXTURE_LIST["dwarf_stay"] = new AnimationTexture(DATA_PATH + "dwarf_stay.png")
+TEXTURE_LIST["dwarf_fall"] = new AnimationTexture(DATA_PATH + "dwarf_stay.png")
+TEXTURE_LIST["dwarf_run"] = new AnimationTexture(DATA_PATH + "dwarf_walk.png")
+TEXTURE_LIST["dwarf_jump"] = new AnimationTexture(DATA_PATH + "dwarf_stay.png")
 
 
 //GAME INIT START
 var gameTime = 0;
 var lastTime;
 
-var hero = new Alive(0,0,300,300,"hero")
+var hero = new Alive(0,0,300,300,"dwarf")
 BACKGROUNDS[0] = new Sprite(0,0,800,600,"background")
 
 
