@@ -95,14 +95,13 @@ class Texture{
 }
 class AnimationTexture extends Texture{
   constructor(path,n=1,fspeed=20){
+		super(path)
+
     this.frames = n
-    this.frameWidth = 0
     this.frameSpeed = fspeed
 
-    super(path)
-
     this.data.onload = function(){
-    	this.frameWidth = Math.floor(this.data.width / n)
+    	this.frameWidth = Math.floor(this.data.naturalWidth / n)
     }
   }
 }
@@ -158,14 +157,14 @@ class Sprite extends Entity{
     this.texture = TEXTURE_LIST[source_path]
   }
   draw(){
-    ctx.drawImage(this.texture.data, \
-                  this.x, \
-                  this.y, \
-                  this.width, \
-                  this.heigth, \
-                  0, \
-                  0, \
-                  this.texture.data.width, \
+    ctx.drawImage(this.texture.data,
+                  this.x,
+                  this.y,
+                  this.width,
+                  this.heigth,
+                  0,
+                  0,
+                  this.texture.data.width,
                   this.texture.data.heigth)
   }
   update(dt){}
@@ -176,14 +175,14 @@ class ASprite extends Sprite{
     this.frameStatus = 0
   }
   draw(){
-    ctx.drawImage(this.texture.data, \
-                  this.x, \
-                  this.y, \
-                  this.width, \
-                  this.heigth, \
-                  Math.floor(this.frameStatus/this.frameSpeed)*this.texture.frameWidth, \
-                  0, \
-                  this.texture.frameWidth, \
+    ctx.drawImage(this.texture.data,
+                  this.x,
+                  this.y,
+                  this.width,
+                  this.heigth,
+                  Math.floor(this.frameStatus/this.frameSpeed)*this.texture.frameWidth,
+                  0,
+                  this.texture.frameWidth,
                   this.texture.data.heigth)
   }
   update(dt){
@@ -213,54 +212,67 @@ class Alive extends Entity{
   draw(){
       switch(this.entityState){
         case ANIMATION_STATE_STAY:
-          ctx.drawImage(this.animation_stay.data, \
-                        this.x, \
-                        this.y, \
-                        this.width, \
-                        this.heigth, \
-                        (this.frameWidth*this.direction-1) + Math.floor(this.frameStatus/this.frameSpeed)*this.animation_stay.frameWidth, \
-                        0, \
-                        (-1*this.direction) * this.animation_stay.frameWidth, \
+          ctx.drawImage(this.animation_stay.data,
+                        this.x,
+                        this.y,
+                        this.width,
+                        this.heigth,
+                        (this.frameWidth*this.direction-1) + Math.floor(this.frameStatus/this.frameSpeed)*this.animation_stay.frameWidth,
+                        0,
+                        (-1*this.direction) * this.animation_stay.frameWidth,
                         (-1*this.direction) * this.animation_stay.data.heigth)
           break
         case ANIMATION_STATE_FALL:
-          ctx.drawImage(this.animation_fall.data, \
-                        this.x, \
-                        this.y, \
-                        this.width, \
-                        this.heigth, \
-                        (this.frameWidth*this.direction-1) + Math.floor(this.frameStatus/this.frameSpeed)*this.animation_fall.frameWidth, \
-                        0, \
-                        (-1*this.direction) * this.animation_fall.frameWidth, \
+          ctx.drawImage(this.animation_fall.data,
+                        this.x,
+                        this.y,
+                        this.width,
+                        this.heigth,
+                        (this.frameWidth*this.direction-1) + Math.floor(this.frameStatus/this.frameSpeed)*this.animation_fall.frameWidth,
+                        0,
+                        (-1*this.direction) * this.animation_fall.frameWidth,
                         (-1*this.direction) * this.animation_fall.data.heigth)
           break
         case ANIMATION_STATE_RUN:
-          ctx.drawImage(this.animation_run.data, \
-                        this.x, \
-                        this.y, \
-                        this.width, \
-                        this.heigth, \
-                        (this.frameWidth*this.direction-1) + Math.floor(this.frameStatus/this.frameSpeed)*this.animation_run.frameWidth, \
-                        0, \
-                        (-1*this.direction) * this.animation_run.frameWidth, \
+          ctx.drawImage(this.animation_run.data,
+                        this.x,
+                        this.y,
+                        this.width,
+                        this.heigth,
+                        (this.frameWidth*this.direction-1) + Math.floor(this.frameStatus/this.frameSpeed)*this.animation_run.frameWidth,
+                        0,
+                        (-1*this.direction) * this.animation_run.frameWidth,
                         (-1*this.direction) * this.animation_run.data.heigth)
           break
         case ANIMATION_STATE_JUMP:
-          ctx.drawImage(this.animation_jump.data, \
-                        this.x, \
-                        this.y, \
-                        this.width, \
-                        this.heigth, \
-                        (this.frameWidth*this.direction-1) + Math.floor(this.frameStatus/this.frameSpeed)*this.animation_jump.frameWidth, \
-                        0, \
-                        (-1*this.direction) * this.animation_jump.frameWidth, \
+          ctx.drawImage(this.animation_jump.data,
+                        this.x,
+                        this.y,
+                        this.width,
+                        this.heigth,
+                        (this.frameWidth*this.direction-1) + Math.floor(this.frameStatus/this.frameSpeed)*this.animation_jump.frameWidth,
+                        0,
+                        (-1*this.direction) * this.animation_jump.frameWidth,
                         (-1*this.direction) * this.animation_jump.data.heigth)
           break
       }
     }
 
     update = function(dt){
-      this.frameStatus = (this.frameStatus+dt)%(this.texture.frames*this.frameSpeed)
+			switch(this.entityState){
+				case ANIMATION_STATE_STAY:
+      		this.frameStatus = (this.frameStatus+dt)%(this.animation_stay.frames*this.frameSpeed)
+					break
+				case ANIMATION_STATE_FALL:
+      		this.frameStatus = (this.frameStatus+dt)%(this.animation_fall.frames*this.frameSpeed)
+					break
+				case ANIMATION_STATE_RUN:
+      		this.frameStatus = (this.frameStatus+dt)%(this.animation_run.frames*this.frameSpeed)
+					break
+				case ANIMATION_STATE_JUMP:
+      		this.frameStatus = (this.frameStatus+dt)%(this.animation_jump.frames*this.frameSpeed)
+					break
+			}
     }
 }
 
@@ -297,13 +309,18 @@ class Hero extends Alive{
 			LIFELESSES.collide(this)
 		}
 
-		if(fallFlag){
+		if(speedY>0){
 			if(this.entityState != ANIMATION_STATE_FALL){
 				newFlag = true
 				this.entityState = ANIMATION_STATE_FALL
 			}
 		}
-		else if(runFlag){
+		else if(speedY<0){
+			if(this.entityState != ANIMATION_STATE_JUMP){
+				newFlag = true
+				this.entityState = ANIMATION_STATE_JUMP
+			}
+		}else	if(runFlag){
 			if(this.entityState != ANIMATION_STATE_RUN){
 				newFlag = true
         this.entityState = ANIMATION_STATE_RUN
@@ -311,7 +328,7 @@ class Hero extends Alive{
 		}
     if(newFlag) this.frameStatus=0;
     else this.frameStatus = (this.frameStatus+dt)%(this.texture.frames*this.frameSpeed)
-
+	}
 }
 
 
@@ -319,20 +336,24 @@ class Hero extends Alive{
 
 //LOAD DATA
 TEXTURE_LIST["background"] = new Texture(DATA_PATH + "background_forest_1.png")
-TEXTURE_LIST["ground_forest_1"] = new Texture(DATA_PATH + "ground_forest_1.png")
+TEXTURE_LIST["ground"] = new Texture(DATA_PATH + "ground_forest_1.png")
 
-TEXTURE_LIST["dwarf_stay"] = new AnimationTexture(DATA_PATH + "dwarf_stay.png")
-TEXTURE_LIST["dwarf_fall"] = new AnimationTexture(DATA_PATH + "dwarf_stay.png")
-TEXTURE_LIST["dwarf_run"] = new AnimationTexture(DATA_PATH + "dwarf_walk.png")
-TEXTURE_LIST["dwarf_jump"] = new AnimationTexture(DATA_PATH + "dwarf_stay.png")
+TEXTURE_LIST["dwarf_stay"] = new AnimationTexture(DATA_PATH + "dwarf_stay.png",8)
+TEXTURE_LIST["dwarf_fall"] = new AnimationTexture(DATA_PATH + "dwarf_stay.png",8)
+TEXTURE_LIST["dwarf_run"] = new AnimationTexture(DATA_PATH + "dwarf_walk.png",6)
+TEXTURE_LIST["dwarf_jump"] = new AnimationTexture(DATA_PATH + "dwarf_stay.png",8)
 
-
+//load waiting
+while(true){
+		for(let x in TEXTURE_LIST)if(!TEXTURE_LIST[x].data.complete)continue
+		break
+}
 //GAME INIT START
 var gameTime = 0;
 var lastTime;
 
 var hero = new Alive(0,0,300,300,"dwarf")
-LIFELESSES[0] = new Sprite(0,200,800,600,"ground_forest_1")
+LIFELESSES[0] = new Sprite(0,200,800,600,"ground")
 BACKGROUNDS[0] = new Sprite(0,0,800,600,"background")
 
 
@@ -350,17 +371,6 @@ function update(dt){
 
 
 function render(){
-	let width = window.innerWidth;
-	let height = window.innerHeight;
-	if(width/height > 800/600){
-		//Подгоняем высоту
-		$('canvas').css('height', height);
-		$('canvas').css('width', height/600*800);
-	}else{
-		//Подгоняем ширину
-		$('canvas').css('width', width);
-		$('canvas').css('height', width/800*600);
-	}
 
   //background
   BACKGROUNDS[0].draw()
