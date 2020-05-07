@@ -54,27 +54,44 @@ TEXTURE_LIST["dwarf_run"] = new AnimationTexture(DATA_PATH + "dwarf_walk.png",6)
 TEXTURE_LIST["dwarf_jump"] = new AnimationTexture(DATA_PATH + "dwarf_stay.png",8)
 
 //load waiting
-while(true){
-		for(let x in TEXTURE_LIST)if(!TEXTURE_LIST[x].data.complete)continue
-		break
+let texture = TEXTURE_LIST["dwarf_stay"]
+
+
+let promisses = []
+for(let x in TEXTURE_LIST){
+	let texture = TEXTURE_LIST[x]
+	promisses.push(new Promise((resolve,reject)=>{
+		texture.data.addEventListener("load", ()=>{
+			if(texture.frameWidth)texture.frameWidth = Math.floor(texture.data.naturalWidth / texture.frames)
+			resolve()
+		},{once:true})
+
+	}))
 }
-console.log('load end')
+console.log("c",promisses,TEXTURE_LIST)
+Promise.all(promisses).then(initial).catch((e)=>{console.log(e)})
+
+
+
 
 //GAME INIT START
-ctx.fillStyle = "#000"
-ctx.strokeStyle = "yellow"
-ctx.imageSmoothingEnabled = false
+function initial(){
+	console.log('load end')
+	ctx.fillStyle = "#000"
+	ctx.strokeStyle = "yellow"
+	ctx.imageSmoothingEnabled = false
 
-//canvas.style.width = window.innerWidth
-//canvas.style.height = window.innerHeight
+	//canvas.style.width = window.innerWidth
+	//canvas.style.height = window.innerHeight
+	let scale = 3
+	lastTime = Date.now()
+	hero = new Hero(100,100,scale,"dwarf")
+	LIFELESSES.push(new Sprite(100,400,scale,"ground"))
+	BACKGROUNDS.push(new Sprite(0,0,scale,"background"))
 
-var lastTime = Date.now()
-var hero = new Hero(100,100,300,300,"dwarf")
-LIFELESSES.push(new Sprite(100,400,600,100,"ground"))
-BACKGROUNDS.push(new Sprite(0,0,800,600,"background"))
 
-
-requestAnimationFrame(frame);
+	requestAnimationFrame(frame);
+}
 ////
 
 //MAIN FUNCTIONS

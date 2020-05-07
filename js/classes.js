@@ -12,21 +12,17 @@ class AnimationTexture extends Texture{
     this.frames = n
     this.frameSpeed = fspeed
 		this.frameWidth = 1
-
-    this.data.onload = ()=>{
-    	this.frameWidth = Math.floor(this.data.width / n)
-    }
   }
 }
 
 
 
 class Entity{
-  constructor(x=0,y=0,w=1,h=1,type=0){
+  constructor(x=0,y=0,s=1,type=0){
     this.x = x
     this.y = y
-    this.width = w
-    this.height = h
+    this.width = s
+    this.height = s
 
 		this.type = type
   }
@@ -76,9 +72,12 @@ class Entity{
 
 
 class Sprite extends Entity{
-  constructor(x=0,y=0,w=0,h=0,source_path="",type=0){
-    super(x,y,w,h,type)
+  constructor(x=0,y=0,s=0,source_path="",type=0,texture_dominate = false){
+    super(x,y,s,type)
     this.texture = TEXTURE_LIST[source_path]
+
+    this.width = this.texture.data.naturalWidth * s
+    this.height = this.texture.data.naturalHeight * s
   }
   draw(){
     ctx.drawImage(this.texture.data,
@@ -102,8 +101,8 @@ class Sprite extends Entity{
   update(dt){}
 }
 class ASprite extends Sprite{
-  constructor(x=0,y=0,w=0,h=0,source_path="",type=0){
-    super(x,y,w,h,source_path="",type)
+  constructor(x=0,y=0,s=0,source_path="",type=0,texture_dominate = false){
+    super(x,y,s,source_path="",type,texture_dominate)
     this.frameStatus = 0
   }
   draw(){
@@ -132,8 +131,8 @@ class ASprite extends Sprite{
 
 
 class Alive extends Entity{
-  constructor(x=0,y=0,w=0,h=0,source_path=""){
-    super(x,y,w,h)
+  constructor(x=0,y=0,s=0,source_path="",type = 0){
+    super(x,y,s,type)
     this.speedX = 0
     this.speedY = 0
 		this.accelerationX = 10
@@ -147,6 +146,9 @@ class Alive extends Entity{
     this.animation_run = TEXTURE_LIST[source_path+"_run"]
     this.animation_fall = TEXTURE_LIST[source_path+"_fall"]
     this.animation_jump = TEXTURE_LIST[source_path+"_jump"]
+
+    this.width = this.animation_stay.frameWidth * s
+    this.height = this.animation_stay.data.height * s
   }
 
   draw(){
@@ -235,8 +237,8 @@ class Alive extends Entity{
 
 
 class Hero extends Alive{
-	constructor(x=0,y=0,w=0,h=0,source_path=""){
-    super(x,y,w,h,source_path)
+	constructor(x=0,y=0,s=0,source_path="",type=0){
+    super(x,y,s,source_path,type)
   }
   update = function(dt){
     var newFlag = false

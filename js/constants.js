@@ -8,7 +8,7 @@ const PRESSED_KEYS = new Array(128)
 const LIFELESSES = []
 const BACKGROUNDS = []
 const ALIVES = []
-const TEXTURE_LIST = {}
+const TEXTURE_LIST = new Map()
 
 //animation states
 const ANIMATION_STATE_STAY=0
