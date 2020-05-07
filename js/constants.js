@@ -1,11 +1,12 @@
 //CONSTANTS
 //other
+const PIXEL_SCALE = 3
 const DATA_PATH = "resources/"
 const DEBUG = true
 
 //physics
 const GRAVITY = 70
-const TIME_BOOSTER = 3
+const TIME_BOOSTER = 2
 
 //arrays
 const PRESSED_KEYS = new Array(128)

@@ -4,7 +4,7 @@ requestAnimationFrame = window.requestAnimationFrame ||
 	window.oRequestAnimationFrame ||
 	window.msRequestAnimationFrame ||
 	function(callback){ window.setTimeout(callback, 66) }
-
+frameID = undefined
 
 var canvas = document.getElementById("viewport")
 var ctx = canvas.getContext('2d')
@@ -24,6 +24,13 @@ document.addEventListener('keyup', function(e) {
 
 window.addEventListener('blur', function() {
   PRESSED_KEYS.fill(false)
+	if(frameID)cancelAnimationFrame(frameID);
+});
+window.addEventListener('focus', function() {
+	if(frameID){
+		lastTime = Date.now()
+		frameID = requestAnimationFrame(frame)
+	}
 });
 
 window.addEventListener("resize", function() {
@@ -80,17 +87,13 @@ function initial(){
 	ctx.strokeStyle = "yellow"
 	ctx.imageSmoothingEnabled = false
 
-	//canvas.style.width = window.innerWidth
-	//canvas.style.height = window.innerHeight
-	let scale = 3
-	lastTime = Date.now()
-	hero = new Hero(100,100,scale,"dwarf")
-	LIFELESSES.push(new Sprite(100,400,scale,"ground"))
-	LIFELESSES.push(new Sprite(200,300,scale,"ground"))
-	BACKGROUNDS.push(new Sprite(0,0,scale,"background"))
+	window.hero = new Hero(100,100,PIXEL_SCALE,"dwarf")
+	LIFELESSES.push(new Sprite(100,400,PIXEL_SCALE,"ground"))
+	LIFELESSES.push(new Sprite(200,300,PIXEL_SCALE,"ground"))
+	BACKGROUNDS.push(new Sprite(0,0,PIXEL_SCALE,"background"))
 
-
-	requestAnimationFrame(frame);
+	window.lastTime = Date.now()
+	window.frameID = requestAnimationFrame(frame);
 }
 ////
 
@@ -131,5 +134,5 @@ function frame(){
 	render()
 
 	lastTime = now
-	requestAnimationFrame(frame)
+	frameID=requestAnimationFrame(frame)
 }
