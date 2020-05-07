@@ -105,17 +105,20 @@ function update(dt){
 
 
 function render(){
-	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	let dx = (canvas.width - hero.width)*0.5 - hero.x
+	let dy = (canvas.height - hero.height)*0.5 - hero.y
+
+	ctx.clearRect(0,0,canvas.width,canvas.height)
   //background
-	BACKGROUNDS[0].draw()
-  for(let i=1;i<BACKGROUNDS.length;i++)BACKGROUNDS[i].draw()
+	BACKGROUNDS[0].draw(dx,dy)
+  for(let i=1;i<BACKGROUNDS.length;i++)BACKGROUNDS[i].draw(dx,dy)
 
   //other entity
-  for(let i=0;i<LIFELESSES.length;i++)LIFELESSES[i].draw()
-  for(let i=0;i<ALIVES.length;i++)ALIVES[i].draw()
+  for(let i=0;i<LIFELESSES.length;i++)LIFELESSES[i].draw(dx,dy)
+  for(let i=0;i<ALIVES.length;i++)ALIVES[i].draw(dx,dy)
 
 	//hero
-	hero.draw()
+	hero.draw(dx,dy)
 
 }
 

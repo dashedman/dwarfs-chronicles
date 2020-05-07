@@ -98,31 +98,31 @@ class Sprite extends Entity{
     this.width = this.texture.data.naturalWidth * s
     this.height = this.texture.data.naturalHeight * s
   }
-  draw(){
+  draw(dx=0,dy=0){
     ctx.drawImage(this.texture.data,
 									0,
 									0,
 									this.texture.data.width,
 									this.texture.data.height,
-									this.x,
-									this.y,
+									this.x+dx,
+									this.y+dy,
 									this.width,
 									this.height)
     if(DEBUG){
       if(this.collideFlag){
         ctx.strokeStyle = "red"
-        ctx.strokeRect( this.x+1,
-                        this.y+1,
+        ctx.strokeRect( this.x+1+dx,
+                        this.y+1+dy,
                         this.width-2,
                         this.height-2 )
         ctx.strokeStyle = "yellow"
       }
-      ctx.strokeRect( this.x,
-                      this.y,
+      ctx.strokeRect( this.x+dx,
+                      this.y+dy,
                       this.width,
                       this.height)
-      ctx.strokeText("x:"+this.x,this.x,this.y+10)
-      ctx.strokeText("y:"+this.y,this.x,this.y+20)
+      ctx.strokeText("x:"+this.x,this.x+dx,this.y+dy+10)
+      ctx.strokeText("y:"+this.y,this.x+dx,this.y+dy+20)
     }
   }
   update(dt){}
@@ -132,31 +132,31 @@ class ASprite extends Sprite{
     super(x,y,s,source_path="",type,texture_dominate)
     this.frameStatus = 0
   }
-  draw(){
+  draw(dx=0,dy=0){
     ctx.drawImage(this.texture.data,
                   Math.floor(this.frameStatus/this.texture.frameSpeed)*this.texture.frameWidth,
                   0,
                   this.texture.frameWidth,
                   this.texture.data.height,
-									this.x,
-									this.y,
+                  this.x+dx,
+									this.y+dy,
 									this.width,
 									this.height)
     if(DEBUG){
       if(this.collideFlag){
         ctx.strokeStyle = "red"
-        ctx.strokeRect( this.x+1,
-                        this.y+1,
+        ctx.strokeRect( this.x+1+dx,
+                        this.y+1+dy,
                         this.width-2,
                         this.height-2 )
         ctx.strokeStyle = "yellow"
       }
-      ctx.strokeRect( this.x,
-                      this.y,
+      ctx.strokeRect( this.x+dx,
+                      this.y+dy,
                       this.width,
-                      this.height )
-      ctx.strokeText("x:"+this.x,this.x,this.y+10)
-      ctx.strokeText("y:"+this.y,this.x,this.y+20)
+                      this.height)
+      ctx.strokeText("x:"+this.x,this.x+dx,this.y+dy+10)
+      ctx.strokeText("y:"+this.y,this.x+dx,this.y+dy+20)
     }
   }
   update(dt){
@@ -201,9 +201,9 @@ class Alive extends Entity{
     this.height = newHeight
   }
 
-  draw(){
+  draw(dx=0,dy=0){
       if(this.direction<0){
-        ctx.translate(this.x*2+this.width, 0)
+        ctx.translate((this.x+dx)*2+this.width, 0)
         ctx.scale(-1,1)
       }
 
@@ -212,23 +212,23 @@ class Alive extends Entity{
                     0,
                     this.curentAnimation.frameWidth,
                     this.curentAnimation.data.height,
-										this.x,
-										this.y,
+                    this.x+dx,
+  									this.y+dy,
 										this.width,
 										this.height)
 
       if(this.direction<0){
+        ctx.translate((this.x+dx)*2+this.width, 0)
         ctx.scale(-1,1)
-        ctx.translate(-this.x*2-this.width, 0)
       }
       if(DEBUG){
-        ctx.strokeRect( this.x,
-                  this.y,
-                  this.width,
-                  this.height)
-    		ctx.strokeText("x:"+this.x+" y:"+this.y,this.x,this.y+10)
-    		ctx.strokeText("dx:"+this.speedX+" dy:"+this.speedY,this.x,this.y+20)
-        ctx.strokeText("state:"+this.entityState+" frame"+this.frameStatus,this.x,this.y+30)
+        ctx.strokeRect( this.x+dx,
+                        this.y+dy,
+                        this.width,
+                        this.height)
+    		ctx.strokeText("x:"+this.x+" y:"+this.y,this.x+dx,this.y+dy-25)
+    		ctx.strokeText("dx:"+this.speedX+" dy:"+this.speedY,this.x+dx,this.y+dy-15)
+        ctx.strokeText("state:"+this.entityState+" frame"+this.frameStatus,this.x+dx,this.y+dy-5)
       }
     }
 
