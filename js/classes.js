@@ -42,26 +42,31 @@ class Entity{
 							obj.y > this.y+this.height)return;
 
 						//collision reaction
-            let koeficientX = Math.abs(this.x+this.width*0.5 - (obj.x+obj.width*0.5))/(obj.width*this.width)
-            let koeficientY = Math.abs(this.y+this.height*0.5 - (obj.y+obj.height*0.5))/(obj.height*this.height)
-            if(koeficientX<koeficientY){
-                if(obj.speedY>0){
-    							obj.y = this.y+this.height
-    							obj.speedY = 0
-    						}else if(obj.speedY<0){
-    							obj.speedY = 0
-    							obj.y = this.y - obj.height
-    							obj.onFloor = 1
-    						}
-            }else{
-  						if(obj.speedX>0){
+            if(obj.speedY>0){
+
+              if( obj.speedX>0 && (obj.x+obj.width-this.x)<(obj.y+obj.height-this.y) ){
   							obj.x = this.x-obj.width
-  						}else if(obj.speedX<0){
+  						}else if(obj.speedX<0 && (this.x+this.width-obj.x)<(obj.y+obj.height-this.y) ){
   							obj.x = this.x+this.width
-  						}
-            }
+  						}else{
+                obj.speedY = 0
+  							obj.y = this.y - obj.height
+  							obj.onFloor = 1
+              }
 
+						}else if(obj.speedY<0){
 
+              if(obj.speedX>0 && (obj.x+obj.width-this.x)<(this.y+this.height-obj.y) ){
+  							obj.x = this.x-obj.width
+  						}else if(obj.speedX<0 && (this.x+this.width-obj.x)<(this.y+this.height-obj.y) ){
+  							obj.x = this.x+this.width
+  						}else{
+                obj.y = this.y + this.height
+  							obj.speedY = 0
+                obj.onFloor = 0
+              }
+
+						}
 						break
 				}
 				break
@@ -204,8 +209,8 @@ class Alive extends Entity{
                   this.y,
                   this.width,
                   this.height)
-    		ctx.strokeText("x:"+this.x,this.x,this.y+10)
-    		ctx.strokeText("y:"+this.y,this.x,this.y+20)
+    		ctx.strokeText("x:"+this.x+" y:"+this.y,this.x,this.y+10)
+    		ctx.strokeText("dx:"+this.speedX+" dy:"+this.speedY,this.x,this.y+20)
         ctx.strokeText("state:"+this.entityState+" frame"+this.frameStatus,this.x,this.y+30)
       }
     }
@@ -239,6 +244,7 @@ class Hero extends Alive{
 		var fallFlag = false
 
     //ХОДИТ
+    this.speedX = 0
 		if( PRESSED_KEYS[ KEY_LEFT ] || PRESSED_KEYS[ KEY_A ] ) {
 			runFlag = true
 			this.speedX = -100
@@ -253,12 +259,12 @@ class Hero extends Alive{
 		}
 
       //Физика прыжжка
-		if( PRESSED_KEYS[KEY_SPACE] && this.onFloor){
-			this.speedY = 100
+		if( PRESSED_KEYS[KEY_SPACE]){// && this.onFloor){
+			this.speedY = -100
 			//this.onFloor -= 1
 		}
-		this.speedY = this.speedY - dt * 50
-		this.y -= this.speedY * dt * 2
+		this.speedY = this.speedY + dt * 50
+		this.y += this.speedY * dt * 2
 
 		for(let i=0;i<LIFELESSES.length;i++){
 			LIFELESSES[i].collide(this)
