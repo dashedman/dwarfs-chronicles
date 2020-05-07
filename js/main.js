@@ -86,6 +86,7 @@ function initial(){
 	lastTime = Date.now()
 	hero = new Hero(100,100,scale,"dwarf")
 	LIFELESSES.push(new Sprite(100,400,scale,"ground"))
+	LIFELESSES.push(new Sprite(200,300,scale,"ground"))
 	BACKGROUNDS.push(new Sprite(0,0,scale,"background"))
 
 
@@ -116,13 +117,9 @@ function render(){
 	//hero
 	hero.draw()
 
-	if(DEBUG){
-	}
 }
 
 
-
-var c=0
 function frame(){
 	let now = Date.now()
 	let dt = (now - lastTime)/1000
@@ -130,8 +127,6 @@ function frame(){
 	update(dt)
 	render()
 
-	c++
 	lastTime = now
-//	if(c<10)
 	requestAnimationFrame(frame)
 }

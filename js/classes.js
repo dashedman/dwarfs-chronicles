@@ -26,6 +26,8 @@ class Entity{
     this.height = 1
 
 		this.type = type
+
+    if(DEBUG)this.collideFlag = false
   }
 	collide(obj){
 		switch(this.type){
@@ -33,37 +35,53 @@ class Entity{
 				switch (obj.type) {
 					case TYPE_BOX:
 						//collision flag
-						if(obj.x+obj.width < this.x ||
-							obj.x > this.x+this.width ||
-							obj.y+obj.height < this.y ||
-							obj.y > this.y+this.height)return;
+						if( obj.x+obj.width < this.x ||
+  							obj.x > this.x+this.width ||
+  							obj.y+obj.height < this.y ||
+  							obj.y > this.y+this.height){
+                  if(DEBUG)this.collideFlag = false
+                  return
+                }
 
+
+            if(DEBUG)this.collideFlag = true
 						//collision reaction
-            if(obj.speedY>0){
+            let dcX = (this.x-obj.x)+(this.width-obj.width)*0.5
+            let dcY = (this.y-obj.y)+(this.height-obj.height)*0.5
 
-              if( obj.speedX>0 && (obj.x+obj.width-this.x)<(obj.y+obj.height-this.y) ){
+            if(dcY>0){
+
+              if( dcX>0 && (obj.x+obj.width-this.x)<(obj.y+obj.height-this.y) ){
   							obj.x = this.x-obj.width
-  						}else if(obj.speedX<0 && (this.x+this.width-obj.x)<(obj.y+obj.height-this.y) ){
+                obj.speedX=0
+  						}else if(dcX<0 && (this.x+this.width-obj.x)<(obj.y+obj.height-this.y) ){
   							obj.x = this.x+this.width
-  						}else{
+                obj.speedX=0
+  						}else if( this.x+this.width-obj.x  && obj.x+obj.width-this.x){
                 obj.speedY = 0
   							obj.y = this.y - obj.height
   							obj.onFloor = 1
               }
 
-						}else if(obj.speedY<0){
+						}else if(dcY<0){
 
-              if(obj.speedX>0 && (obj.x+obj.width-this.x)<(this.y+this.height-obj.y) ){
+              if(dcX>0 && (obj.x+obj.width-this.x)<(this.y+this.height-obj.y) ){
   							obj.x = this.x-obj.width
-  						}else if(obj.speedX<0 && (this.x+this.width-obj.x)<(this.y+this.height-obj.y) ){
+  						}else if(dcX<0 && (this.x+this.width-obj.x)<(this.y+this.height-obj.y) ){
   							obj.x = this.x+this.width
-  						}else{
+  						}else if( this.x+this.width-obj.x  && obj.x+obj.width-this.x){
                 obj.y = this.y + this.height
   							obj.speedY = 0
                 obj.onFloor = 0
               }
 
-						}
+						}else{
+              if(dcX>0){
+                obj.x = this.x-obj.width
+              }else if(dcX<0){
+                obj.x = this.x+this.width
+              }
+            }
 						break
 				}
 				break
@@ -91,10 +109,18 @@ class Sprite extends Entity{
 									this.width,
 									this.height)
     if(DEBUG){
+      if(this.collideFlag){
+        ctx.strokeStyle = "red"
+        ctx.strokeRect( this.x+1,
+                        this.y+1,
+                        this.width-2,
+                        this.height-2 )
+        ctx.strokeStyle = "yellow"
+      }
       ctx.strokeRect( this.x,
-                this.y,
-                this.width,
-                this.height)
+                      this.y,
+                      this.width,
+                      this.height)
       ctx.strokeText("x:"+this.x,this.x,this.y+10)
       ctx.strokeText("y:"+this.y,this.x,this.y+20)
     }
@@ -117,10 +143,18 @@ class ASprite extends Sprite{
 									this.width,
 									this.height)
     if(DEBUG){
+      if(this.collideFlag){
+        ctx.strokeStyle = "red"
+        ctx.strokeRect( this.x+1,
+                        this.y+1,
+                        this.width-2,
+                        this.height-2 )
+        ctx.strokeStyle = "yellow"
+      }
       ctx.strokeRect( this.x,
-                this.y,
-                this.width,
-                this.height )
+                      this.y,
+                      this.width,
+                      this.height )
       ctx.strokeText("x:"+this.x,this.x,this.y+10)
       ctx.strokeText("y:"+this.y,this.x,this.y+20)
     }
