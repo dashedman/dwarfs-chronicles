@@ -62,14 +62,16 @@ console.log('load end')
 
 //GAME INIT START
 ctx.fillStyle = "#000"
+ctx.strokeStyle = "yellow"
 ctx.imageSmoothingEnabled = false
-canvas.style.width = window.innerWidth
-canvas.style.height = window.innerHeight
+
+//canvas.style.width = window.innerWidth
+//canvas.style.height = window.innerHeight
 
 var lastTime = Date.now()
 var hero = new Hero(100,100,300,300,"dwarf")
-LIFELESSES[0] = new Sprite(0,200,800,600,"ground")
-BACKGROUNDS[0] = new Sprite(0,0,800,600,"background")
+LIFELESSES.push(new Sprite(100,400,600,100,"ground"))
+BACKGROUNDS.push(new Sprite(0,0,800,600,"background"))
 
 
 requestAnimationFrame(frame);
@@ -99,14 +101,6 @@ function render(){
 	hero.draw()
 
 	if(DEBUG){
-		ctx.fillStyle = "yellow"
-		ctx.fillText(hero.entityState+" "+hero.frameStatus,100,100)
-		ctx.fillText(hero.x,100,130)
-		ctx.fillText(hero.y,100,160)
-		ctx.fillText(hero.animation_fall.frameWidth*(hero.direction*0.5-0.5) + Math.floor(hero.frameStatus/hero.animation_fall.frameSpeed)*hero.animation_fall.frameWidth,100,180)
-		ctx.fillText((hero.direction) * hero.animation_fall.frameWidth,100,200)
-		ctx.fillText((hero.direction) * hero.animation_fall.data.height,100,220)
-		ctx.fillStyle = "black"
 	}
 }
 

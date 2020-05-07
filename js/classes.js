@@ -14,7 +14,6 @@ class AnimationTexture extends Texture{
 		this.frameWidth = 1
 
     this.data.onload = ()=>{
-			console.log("huh",path,this)
     	this.frameWidth = Math.floor(this.data.width / n)
     }
   }
@@ -43,20 +42,26 @@ class Entity{
 							obj.y > this.y+this.height)return;
 
 						//collision reaction
-						if(obj.speedX>0){
-							obj.x = this.x-obj.width
-						}else if(obj.speedX<0){
-							obj.x = this.x+this.width
-						}
+            let koeficientX = Math.abs(this.x+this.width*0.5 - (obj.x+obj.width*0.5))/(obj.width*this.width)
+            let koeficientY = Math.abs(this.y+this.height*0.5 - (obj.y+obj.height*0.5))/(obj.height*this.height)
+            if(koeficientX<koeficientY){
+                if(obj.speedY>0){
+    							obj.y = this.y+this.height
+    							obj.speedY = 0
+    						}else if(obj.speedY<0){
+    							obj.speedY = 0
+    							obj.y = this.y - obj.height
+    							obj.onFloor = 1
+    						}
+            }else{
+  						if(obj.speedX>0){
+  							obj.x = this.x-obj.width
+  						}else if(obj.speedX<0){
+  							obj.x = this.x+this.width
+  						}
+            }
 
-						if(obj.speedY<0){
-							obj.y = this.y+this.height
-							obj.speedY = 0
-						}else if(obj.speedY>0){
-							obj.speedY = 0
-							obj.y = this.y - obj.height
-							obj.onFloor = 1
-						}
+
 						break
 				}
 				break
@@ -80,6 +85,14 @@ class Sprite extends Entity{
 									this.y,
 									this.width,
 									this.height)
+    if(DEBUG){
+      ctx.strokeRect( this.x,
+                this.y,
+                this.width,
+                this.height)
+      ctx.strokeText("x:"+this.x,this.x,this.y+10)
+      ctx.strokeText("y:"+this.y,this.x,this.y+20)
+    }
   }
   update(dt){}
 }
@@ -98,6 +111,14 @@ class ASprite extends Sprite{
 									this.y,
 									this.width,
 									this.height)
+    if(DEBUG){
+      ctx.strokeRect( this.x,
+                this.y,
+                this.width,
+                this.height )
+      ctx.strokeText("x:"+this.x,this.x,this.y+10)
+      ctx.strokeText("y:"+this.y,this.x,this.y+20)
+    }
   }
   update(dt){
     this.frameStatus = (this.frameStatus+dt*100)%(this.texture.frames*this.texture.frameSpeed)
@@ -124,12 +145,16 @@ class Alive extends Entity{
   }
 
   draw(){
+      if(this.direction<0){
+        ctx.translate(this.x*2+this.width, 0)
+        ctx.scale(-1,1)
+      }
       switch(this.entityState){
         case ANIMATION_STATE_STAY:
           ctx.drawImage(this.animation_stay.data,
-                        this.animation_stay.frameWidth*(this.direction*0.5-0.5) + Math.floor(this.frameStatus/this.animation_stay.frameSpeed)*this.animation_stay.frameWidth,
+                        Math.floor(this.frameStatus/this.animation_stay.frameSpeed)*this.animation_stay.frameWidth,
                         0,
-                        (this.direction) * this.animation_stay.frameWidth,
+                        this.animation_stay.frameWidth,
                         this.animation_stay.data.height,
 												this.x,
 												this.y,
@@ -138,9 +163,9 @@ class Alive extends Entity{
           break
         case ANIMATION_STATE_FALL:
           ctx.drawImage(this.animation_fall.data,
-                        this.animation_fall.frameWidth*(this.direction*0.5-0.5) + Math.floor(this.frameStatus/this.animation_fall.frameSpeed)*this.animation_fall.frameWidth,
+                        Math.floor(this.frameStatus/this.animation_fall.frameSpeed)*this.animation_fall.frameWidth,
                         0,
-                        (this.direction) * this.animation_fall.frameWidth,
+                        this.animation_fall.frameWidth,
                         this.animation_fall.data.height,
 												this.x,
 	                      this.y,
@@ -149,9 +174,9 @@ class Alive extends Entity{
           break
         case ANIMATION_STATE_RUN:
           ctx.drawImage(this.animation_run.data,
-                        this.animation_run.frameWidth*(this.direction*0.5-0.5) + Math.floor(this.frameStatus/this.animation_run.frameSpeed)*this.animation_run.frameWidth,
+                        Math.floor(this.frameStatus/this.animation_run.frameSpeed)*this.animation_run.frameWidth,
                         0,
-                        (this.direction) * this.animation_run.frameWidth,
+                        this.animation_run.frameWidth,
                         this.animation_run.data.height,
                         this.x,
                         this.y,
@@ -160,15 +185,28 @@ class Alive extends Entity{
           break
         case ANIMATION_STATE_JUMP:
           ctx.drawImage(this.animation_jump.data,
-                        this.animation_jump.frameWidth*(this.direction*0.5-0.5) + Math.floor(this.frameStatus/this.animation_jump.frameSpeed)*this.animation_jump.frameWidth,
+                        Math.floor(this.frameStatus/this.animation_jump.frameSpeed)*this.animation_jump.frameWidth,
                         0,
-                        (this.direction) * this.animation_jump.frameWidth,
+                        this.animation_jump.frameWidth,
                         this.animation_jump.data.height,
 												this.x,
 												this.y,
 												this.width,
 												this.height)
           break
+      }
+      if(this.direction<0){
+        ctx.scale(-1,1)
+        ctx.translate(-this.x*2-this.width, 0)
+      }
+      if(DEBUG){
+        ctx.strokeRect( this.x,
+                  this.y,
+                  this.width,
+                  this.height)
+    		ctx.strokeText("x:"+this.x,this.x,this.y+10)
+    		ctx.strokeText("y:"+this.y,this.x,this.y+20)
+        ctx.strokeText("state:"+this.entityState+" frame"+this.frameStatus,this.x,this.y+30)
       }
     }
 
@@ -217,13 +255,13 @@ class Hero extends Alive{
       //Физика прыжжка
 		if( PRESSED_KEYS[KEY_SPACE] && this.onFloor){
 			this.speedY = 100
-			this.onFloor -= 1
+			//this.onFloor -= 1
 		}
-		//this.speedY = this.speedY - dt*9.8
-		this.y -= this.speedY * dt
+		this.speedY = this.speedY - dt * 50
+		this.y -= this.speedY * dt * 2
 
 		for(let i=0;i<LIFELESSES.length;i++){
-			LIFELESSES.collide(this)
+			LIFELESSES[i].collide(this)
 		}
 
 		if(this.speedY>0){

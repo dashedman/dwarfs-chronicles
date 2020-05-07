@@ -5,20 +5,16 @@ const DEBUG = true
 
 //arrays
 const PRESSED_KEYS = new Array(128)
-const LIFELESSES = {}
-const BACKGROUNDS = {}
-const ALIVES = {}
+const LIFELESSES = []
+const BACKGROUNDS = []
+const ALIVES = []
 const TEXTURE_LIST = {}
 
 //animation states
-const ANIMATION_STATE_STAY_L=0
-const ANIMATION_STATE_STAY_R=1
-const ANIMATION_STATE_FALL_L=2
-const ANIMATION_STATE_FALL_R=3
-const ANIMATION_STATE_RUN_L=4
-const ANIMATION_STATE_RUN_R=5
-const ANIMATION_STATE_JUMP_L=6
-const ANIMATION_STATE_JUMP_R=7
+const ANIMATION_STATE_STAY=0
+const ANIMATION_STATE_FALL=1
+const ANIMATION_STATE_RUN=2
+const ANIMATION_STATE_JUMP=3
 
 //block types
 const TYPE_BOX = 0
