@@ -21,8 +21,9 @@ class Entity{
   constructor(x=0,y=0,s=1,type=0){
     this.x = x
     this.y = y
-    this.width = s
-    this.height = s
+    this.s = s
+    this.width = 1
+    this.height = 1
 
 		this.type = type
   }
@@ -139,16 +140,31 @@ class Alive extends Entity{
     this.direction = 1
 		this.onFloor = 0
 
-    this.entityState = 0
+    this.entityState = ANIMATION_STATE_STAY
     this.frameStatus = 0
 
-    this.animation_stay = TEXTURE_LIST[source_path+"_stay"]
-    this.animation_run = TEXTURE_LIST[source_path+"_run"]
-    this.animation_fall = TEXTURE_LIST[source_path+"_fall"]
-    this.animation_jump = TEXTURE_LIST[source_path+"_jump"]
+    this.animationList = new Array(4)
+    this.animationList[ANIMATION_STATE_STAY] = TEXTURE_LIST[source_path+"_stay"]
+    this.animationList[ANIMATION_STATE_FALL] = TEXTURE_LIST[source_path+"_fall"]
+    this.animationList[ANIMATION_STATE_RUN] = TEXTURE_LIST[source_path+"_run"]
+    this.animationList[ANIMATION_STATE_JUMP] = TEXTURE_LIST[source_path+"_jump"]
 
-    this.width = this.animation_stay.frameWidth * s
-    this.height = this.animation_stay.data.height * s
+    this.curentAnimation = this.animationList[ANIMATION_STATE_STAY]
+
+    this.width = this.curentAnimation.frameWidth * this.s
+    this.height = this.curentAnimation.data.height * this.s
+  }
+
+  stateUpdate(newState){
+    this.entityState = newState
+    this.curentAnimation = this.animationList[this.entityState]
+
+    let newWidth = this.curentAnimation.frameWidth * this.s
+    let newHeight = this.curentAnimation.data.height * this.s
+    this.x -= (newWidth - this.width)*0.5
+    this.y -= (newHeight - this.height)*0.5
+    this.width = newWidth
+    this.height = newHeight
   }
 
   draw(){
@@ -156,52 +172,17 @@ class Alive extends Entity{
         ctx.translate(this.x*2+this.width, 0)
         ctx.scale(-1,1)
       }
-      switch(this.entityState){
-        case ANIMATION_STATE_STAY:
-          ctx.drawImage(this.animation_stay.data,
-                        Math.floor(this.frameStatus/this.animation_stay.frameSpeed)*this.animation_stay.frameWidth,
-                        0,
-                        this.animation_stay.frameWidth,
-                        this.animation_stay.data.height,
-												this.x,
-												this.y,
-												this.width,
-												this.height)
-          break
-        case ANIMATION_STATE_FALL:
-          ctx.drawImage(this.animation_fall.data,
-                        Math.floor(this.frameStatus/this.animation_fall.frameSpeed)*this.animation_fall.frameWidth,
-                        0,
-                        this.animation_fall.frameWidth,
-                        this.animation_fall.data.height,
-												this.x,
-	                      this.y,
-	                      this.width,
-	                      this.height)
-          break
-        case ANIMATION_STATE_RUN:
-          ctx.drawImage(this.animation_run.data,
-                        Math.floor(this.frameStatus/this.animation_run.frameSpeed)*this.animation_run.frameWidth,
-                        0,
-                        this.animation_run.frameWidth,
-                        this.animation_run.data.height,
-                        this.x,
-                        this.y,
-                        this.width,
-                        this.height)
-          break
-        case ANIMATION_STATE_JUMP:
-          ctx.drawImage(this.animation_jump.data,
-                        Math.floor(this.frameStatus/this.animation_jump.frameSpeed)*this.animation_jump.frameWidth,
-                        0,
-                        this.animation_jump.frameWidth,
-                        this.animation_jump.data.height,
-												this.x,
-												this.y,
-												this.width,
-												this.height)
-          break
-      }
+
+      ctx.drawImage(this.curentAnimation.data,
+                    Math.floor(this.frameStatus/this.curentAnimation.frameSpeed)*this.curentAnimation.frameWidth,
+                    0,
+                    this.curentAnimation.frameWidth,
+                    this.curentAnimation.data.height,
+										this.x,
+										this.y,
+										this.width,
+										this.height)
+
       if(this.direction<0){
         ctx.scale(-1,1)
         ctx.translate(-this.x*2-this.width, 0)
@@ -275,39 +256,28 @@ class Hero extends Alive{
 		if(this.speedY>0){
 			if(this.entityState != ANIMATION_STATE_FALL){
 				newFlag = true
-				this.entityState = ANIMATION_STATE_FALL
+				this.stateUpdate(ANIMATION_STATE_FALL)
 			}
 		}
 		else if(this.speedY<0){
 			if(this.entityState != ANIMATION_STATE_JUMP){
 				newFlag = true
-				this.entityState = ANIMATION_STATE_JUMP
+				this.stateUpdate(ANIMATION_STATE_JUMP)
 			}
 		}else	if(runFlag){
 			if(this.entityState != ANIMATION_STATE_RUN){
 				newFlag = true
-        this.entityState = ANIMATION_STATE_RUN
+        this.stateUpdate(ANIMATION_STATE_RUN)
 			}
 		}else{
 			if(this.entityState != ANIMATION_STATE_STAY){
 				newFlag = true
-        this.entityState = ANIMATION_STATE_STAY
+        this.stateUpdate(ANIMATION_STATE_STAY)
 			}
 		}
+
     if(newFlag) this.frameStatus=0;
-    else switch(this.entityState){
-				case ANIMATION_STATE_STAY:
-      		this.frameStatus = (this.frameStatus+dt*100)%(this.animation_stay.frames*this.animation_stay.frameSpeed)
-					break
-				case ANIMATION_STATE_FALL:
-      		this.frameStatus = (this.frameStatus+dt*100)%(this.animation_fall.frames*this.animation_fall.frameSpeed)
-					break
-				case ANIMATION_STATE_RUN:
-      		this.frameStatus = (this.frameStatus+dt*100)%(this.animation_run.frames*this.animation_run.frameSpeed)
-					break
-				case ANIMATION_STATE_JUMP:
-      		this.frameStatus = (this.frameStatus+dt*100)%(this.animation_jump.frames*this.animation_jump.frameSpeed)
-					break
-    }
+    else this.frameStatus = (this.frameStatus+dt*100)%(this.curentAnimation.frames*this.curentAnimation.frameSpeed)
+
 	}
 }

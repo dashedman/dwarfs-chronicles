@@ -68,7 +68,6 @@ for(let x in TEXTURE_LIST){
 
 	}))
 }
-console.log("c",promisses,TEXTURE_LIST)
 Promise.all(promisses).then(initial).catch((e)=>{console.log(e)})
 
 
