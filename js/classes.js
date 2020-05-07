@@ -280,8 +280,8 @@ class Hero extends Alive{
 			this.speedY = -100
 			//this.onFloor -= 1
 		}
-		this.speedY = this.speedY + dt * 50
-		this.y += this.speedY * dt * 2
+		this.speedY = this.speedY + dt * GRAVITY
+		this.y += this.speedY * dt
 
 		for(let i=0;i<LIFELESSES.length;i++){
 			LIFELESSES[i].collide(this)

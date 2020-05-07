@@ -124,7 +124,7 @@ function frame(){
 	let now = Date.now()
 	let dt = (now - lastTime)/1000
 
-	update(dt)
+	update(dt*TIME_BOOSTER)
 	render()
 
 	lastTime = now

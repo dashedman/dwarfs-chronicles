@@ -3,6 +3,10 @@
 const DATA_PATH = "resources/"
 const DEBUG = true
 
+//physics
+const GRAVITY = 70
+const TIME_BOOSTER = 5
+
 //arrays
 const PRESSED_KEYS = new Array(128)
 const LIFELESSES = []
