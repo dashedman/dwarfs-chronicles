@@ -171,7 +171,7 @@ class Alive extends Entity{
     this.speedX = 0
     this.speedY = 0
 		this.accelerationX = 10
-    this.direction = 1
+    this.jumpPower = 0.5
 		this.onFloor = 0
 
     this.entityState = ANIMATION_STATE_STAY
@@ -277,7 +277,7 @@ class Hero extends Alive{
 
       //Физика прыжжка
 		if( PRESSED_KEYS[KEY_SPACE]){// && this.onFloor){
-			this.speedY = -100
+			this.speedY = -this.jumpPower * GRAVITY
 			//this.onFloor -= 1
 		}
 		this.speedY = this.speedY + dt * GRAVITY

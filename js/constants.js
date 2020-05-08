@@ -5,8 +5,8 @@ const DATA_PATH = "resources/"
 const DEBUG = true
 
 //physics
-const GRAVITY = 70
-const TIME_BOOSTER = 3
+const GRAVITY = 1000
+const TIME_BOOSTER = 1
 
 //arrays
 const PRESSED_KEYS = new Array(128)
