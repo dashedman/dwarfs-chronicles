@@ -58,11 +58,11 @@ window.addEventListener("resize", function() {
 ////SCENE
 
 //LOAD DATA
-TEXTURE_LIST["background"] = new Texture(DATA_PATH + "background_forest_1.png")
-TEXTURE_LIST["ground"] = new Texture(DATA_PATH + "ground_forest_1.png")
+TEXTURE_LIST["background"] = new AnimationTexture(DATA_PATH + "background_forest_1.png")
+TEXTURE_LIST["ground"] = new AnimationTexture(DATA_PATH + "ground_forest_1.png")
 
 TEXTURE_LIST["dwarf_stay"] = new AnimationTexture(DATA_PATH + "dwarf_stay.png",8)
-TEXTURE_LIST["dwarf_fall"] = new AnimationTexture(DATA_PATH + "dwarf_stay.png",8)
+TEXTURE_LIST["dwarf_fall"] = new AnimationTexture(DATA_PATH + "dwarf_fall.png",1)
 TEXTURE_LIST["dwarf_run"] = new AnimationTexture(DATA_PATH + "dwarf_walk.png",6)
 TEXTURE_LIST["dwarf_jump"] = new AnimationTexture(DATA_PATH + "dwarf_jump.png",2,20)
 
