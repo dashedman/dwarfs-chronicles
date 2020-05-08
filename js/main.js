@@ -49,7 +49,7 @@ window.addEventListener("resize", function() {
 		canvas.style.height = window.innerHeight
 	}else{
 		canvas.style.width = window.innerWidth
-		canvas.style.height = window.innerWidth * 9 / 16 
+		canvas.style.height = window.innerWidth * 9 / 16
 	}
 
 })
@@ -132,6 +132,7 @@ function render(){
 	if(DEBUG){
 		ctx.strokeStyle = "blue"
 		ctx.strokeText(canvas.width+" "+canvas.height,20,20)
+		ctx.strokeText(frameID,20,30)
 		ctx.strokeStyle = "yellow"
 	}
 }
@@ -139,7 +140,7 @@ function render(){
 
 function frame(){
 	let now = Date.now()
-	let dt = (now - lastTime)/1000
+	let dt = Math.min(100,now - lastTime)/1000
 
 	update(dt*TIME_BOOSTER)
 	render()
