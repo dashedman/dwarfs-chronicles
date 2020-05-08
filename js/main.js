@@ -8,18 +8,28 @@ frameID = undefined
 
 var canvas = document.getElementById("viewport")
 var ctx = canvas.getContext('2d')
+canvas.width = 1280
+canvas.height = 720
 
-//ACTIONS
-PRESSED_KEYS.fill(false)
-function setKey(event, status) {
-  PRESSED_KEYS[event.keyCode] = status
+if(window.innerWidth>window.innerHeight){
+	canvas.style.width = window.innerHeight * 16 / 9
+	canvas.style.height = window.innerHeight
+}else{
+	canvas.style.width = window.innerWidth
+	canvas.style.height = window.innerWidth * 9/16
 }
 
-document.addEventListener('keydown', function(e) {
-	setKey(e, true);
+
+
+///////////////////////////////////////////////////////////
+//ACTIONS
+PRESSED_KEYS.fill(false)
+
+document.addEventListener('keydown', function(event) {
+	PRESSED_KEYS[event.keyCode] = true
 });
-document.addEventListener('keyup', function(e) {
-	setKey(e, false);
+document.addEventListener('keyup', function(event) {
+	PRESSED_KEYS[event.keyCode] = false
 });
 
 window.addEventListener('blur', function() {
@@ -34,18 +44,14 @@ window.addEventListener('focus', function() {
 });
 
 window.addEventListener("resize", function() {
-	canvas.style.width = window.innerWidth
-	canvas.style.height = window.innerHeight
-	/*hero.update(dt)
-  for(let i=0;i<ALIVES.length;i++){
-		ALIVES[i].update(dt)
+	if(window.innerWidth>window.innerHeight){
+		canvas.style.width = window.innerHeight * 16 / 9
+		canvas.style.height = window.innerHeight
+	}else{
+		canvas.style.width = window.innerWidth
+		canvas.style.height = window.innerWidth * 9 / 16 
 	}
-  for(let i=0;i<LIFELESSES.length;i++){
-		LIFELESSES[i].update(dt)
-	}
-  for(let i=0;i<BACKGROUNDS.length;i++){
-		BACKGROUNDS[i].update(dt)
-	}*/
+
 })
 
 
@@ -123,6 +129,11 @@ function render(){
 	//hero
 	hero.draw(dx,dy)
 
+	if(DEBUG){
+		ctx.strokeStyle = "blue"
+		ctx.strokeText(canvas.width+" "+canvas.height,20,20)
+		ctx.strokeStyle = "yellow"
+	}
 }
 
 

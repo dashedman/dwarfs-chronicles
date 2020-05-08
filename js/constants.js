@@ -6,7 +6,7 @@ const DEBUG = true
 
 //physics
 const GRAVITY = 70
-const TIME_BOOSTER = 2
+const TIME_BOOSTER = 5
 
 //arrays
 const PRESSED_KEYS = new Array(128)
