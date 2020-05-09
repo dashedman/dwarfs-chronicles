@@ -170,9 +170,10 @@ class Alive extends Entity{
     super(x,y,s,type)
     this.speedX = 0
     this.speedY = 0
-		this.accelerationX = 10
+		this.accelerationX = 200
     this.jumpPower = 0.5
 		this.onFloor = 0
+    this.direction = 1
 
     this.entityState = ANIMATION_STATE_STAY
     this.frameStatus = 0
@@ -279,12 +280,14 @@ class Hero extends Alive{
       //WALK
       this.speedX = 0
   		if( PRESSED_KEYS[ KEY_LEFT ] || PRESSED_KEYS[ KEY_A ] ) {
-  			this.speedX = -100
+  			this.speedX = -this.accelerationX
   			this.x += this.speedX * dt
+        this.direction = -1
   		}
   		if( PRESSED_KEYS[ KEY_RIGHT ] || PRESSED_KEYS[ KEY_D ] ) {
-  			this.speedX = 100
+  			this.speedX = this.accelerationX
         this.x += this.speedX * dt
+        this.direction = 1
   		}
 
       //JUMP
