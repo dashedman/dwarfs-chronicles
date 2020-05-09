@@ -11,13 +11,13 @@ var ctx = canvas.getContext('2d')
 canvas.width = 960
 canvas.height = 540
 
-if(window.innerWidth*9 > window.innerHeight*16){
+/*if(window.innerWidth*9 > window.innerHeight*16){
 	canvas.style.width = window.innerHeight * 16 / 9
 	canvas.style.height = window.innerHeight
 }else{
 	canvas.style.width = window.innerWidth
 	canvas.style.height = window.innerWidth * 9/16
-}
+}*/
 
 
 
@@ -103,9 +103,12 @@ function initial(){
 	ctx.imageSmoothingEnabled = false
 
 	window.hero = new Hero(100, 100, PIXEL_SCALE, "dwarf")
+
+
 	LIFELESSES.push(new Sprite(100, 400, PIXEL_SCALE, "ground"))
-	LIFELESSES.push(new Sprite(200, 300, PIXEL_SCALE, "ground"))
 	LIFELESSES.push(new Sprite(100, 600, PIXEL_SCALE, "ground"))
+	LIFELESSES.push(new Sprite(300, 200, PIXEL_SCALE, "ground"))
+	LIFELESSES.push(new Sprite(200, 301, PIXEL_SCALE, "ground"))
 	BACKGROUNDS.push(new Sprite(0, 0, PIXEL_SCALE ,"background"))
 
 	window.lastTime = Date.now()

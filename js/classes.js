@@ -50,22 +50,24 @@ class Entity{
                 }
 
 
-            if(DEBUG)this.collideFlag = true
+                if(DEBUG){
+                  this.collideFlag = true
+                }
 						//collision reaction
             let dcX = (this.x-obj.x)+(this.width-obj.width)*0.5
             let dcY = (this.y-obj.y)+(this.height-obj.height)*0.5
 
 
-            if(dcY>0){
+            if(dcY>0 && obj.speedY>0){
 
-              if( dcX>0 && (obj.x+obj.width-this.x)<(obj.y+obj.height-this.y) ){
+              if( dcX>0 && (obj.x+obj.width-this.x)<=(obj.y+obj.height-this.y) ){
                 //rigth collision for obj
   							obj.x = this.x-obj.width
                 obj.speedX=0
 
                 normalX = 1
                 normalY = 0
-  						}else if(dcX<0 && (this.x+this.width-obj.x)<(obj.y+obj.height-this.y) ){
+  						}else if(dcX<0 && (this.x+this.width-obj.x)<=(obj.y+obj.height-this.y) ){
                 //left collision for obj
   							obj.x = this.x+this.width
                 obj.speedX=0
@@ -81,16 +83,16 @@ class Entity{
                 normalY = 1
               }
 
-						}else if(dcY<0){
+						}else if(dcY<0 && obj.speedY<0){
 
-              if(dcX>0 && (obj.x+obj.width-this.x)<(this.y+this.height-obj.y) ){
+              if(dcX>0 && (obj.x+obj.width-this.x)<=(this.y+this.height-obj.y) ){
                 //rigth collision for obj
   							obj.x = this.x-obj.width
                 obj.speedX=0
 
                 normalX = 1
                 normalY = 0
-  						}else if(dcX<0 && (this.x+this.width-obj.x)<(this.y+this.height-obj.y) ){
+  						}else if(dcX<0 && (this.x+this.width-obj.x)<=(this.y+this.height-obj.y) ){
                 //left collision for obj
   							obj.x = this.x+this.width
                 obj.speedX=0
@@ -154,10 +156,10 @@ class Sprite extends Entity{
     if(DEBUG){
       if(this.collideFlag){
         ctx.strokeStyle = "red"
-        ctx.strokeRect( this.x+1+dx,
-                        this.y+1+dy,
-                        this.width-2,
-                        this.height-2 )
+        ctx.strokeRect( this.x-1+dx,
+                        this.y-1+dy,
+                        this.width+2,
+                        this.height+2 )
         ctx.strokeStyle = "yellow"
       }
       ctx.strokeRect( this.x+dx,
@@ -360,7 +362,7 @@ class Hero extends Alive{
   		}else{
         if(this.seatFlag)newState = ANIMATION_STATE_UPING
       }
-      
+
       //WALK
       this.speedX = 0
   		if( PRESSED_KEYS[ KEY_LEFT ] || PRESSED_KEYS[ KEY_A ] ) {
