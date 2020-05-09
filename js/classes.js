@@ -217,6 +217,7 @@ class Alive extends Entity{
     this.jumpPower = 0.5
     this.onFloor = 0
     this.direction = 1
+    this.seatFlag = false
 
     this.entityState = ANIMATION_STATE_STAY
     this.frameStatus = 0
@@ -228,6 +229,10 @@ class Alive extends Entity{
     this.animationList[ANIMATION_STATE_JUMP_READY] = TEXTURE_LIST[source_path+"_jump_ready"]
     this.animationList[ANIMATION_STATE_JUMP] = TEXTURE_LIST[source_path+"_jump"]
     this.animationList[ANIMATION_STATE_JUMP_END] = TEXTURE_LIST[source_path+"_jump_end"]
+    this.animationList[ANIMATION_STATE_SITING] = TEXTURE_LIST[source_path+"_siting"]
+    this.animationList[ANIMATION_STATE_SEAT] = TEXTURE_LIST[source_path+"_seat"]
+    this.animationList[ANIMATION_STATE_CROUCH] = TEXTURE_LIST[source_path+"_crouch"]
+    this.animationList[ANIMATION_STATE_UPING] = TEXTURE_LIST[source_path+"_uping"]
 
     this.curentAnimation = this.animationList[ANIMATION_STATE_STAY]
 
@@ -236,6 +241,7 @@ class Alive extends Entity{
   }
 
   stateUpdate(newState){
+    if(DEBUG)console.log(newState,this.onFloor,this.seatFlag)
     this.frameStatus=0
     this.entityState = newState
     this.curentAnimation = this.animationList[this.entityState]
@@ -243,7 +249,7 @@ class Alive extends Entity{
     let newWidth = this.curentAnimation.frameWidth * this.s
     let newHeight = this.curentAnimation.data.height * this.s
     this.x -= (newWidth - this.width)*0.5
-    this.y -= (newHeight - this.height)*0.5
+    this.y -= (newHeight - this.height)
     this.width = newWidth
     this.height = newHeight
   }
@@ -319,33 +325,63 @@ class Hero extends Alive{
 
       case ANIMATION_STATE_JUMP_END:
         if(this.frameStatus > (this.curentAnimation.frames-1) * this.curentAnimation.frameSpeed){
-          this.onFloor = 1
+          this.onFloor = true
         }
         else newState = ANIMATION_STATE_JUMP_END
+        break
+
+      case ANIMATION_STATE_SITING:
+        if(this.frameStatus > (this.curentAnimation.frames-1) * this.curentAnimation.frameSpeed){
+          newState = ANIMATION_STATE_SEAT
+          this.seatFlag = true
+        }
+        else newState = ANIMATION_STATE_SITING
+        break
+
+      case ANIMATION_STATE_UPING:
+        if(this.frameStatus > (this.curentAnimation.frames-1) * this.curentAnimation.frameSpeed){
+          this.seatFlag = false
+        }
+        else newState = ANIMATION_STATE_UPING
         break
 
     }//switch end
 
     //event check
     if(newState == 0){
+
+      //SEAT
+      if( PRESSED_KEYS[ KEY_DOWN ] || PRESSED_KEYS[ KEY_S ] ) {
+        if(!this.seatFlag){
+          newState = ANIMATION_STATE_SITING
+        }else{
+          newState = ANIMATION_STATE_SEAT
+        }
+  		}else{
+        if(this.seatFlag)newState = ANIMATION_STATE_UPING
+      }
+      
       //WALK
       this.speedX = 0
   		if( PRESSED_KEYS[ KEY_LEFT ] || PRESSED_KEYS[ KEY_A ] ) {
-  			this.speedX = -this.accelerationX
+  			this.speedX = -this.accelerationX * (this.seatFlag ? 0.5 : 1)
   			this.x += this.speedX * dt
         this.direction = -1
+        if(this.seatFlag)newState = ANIMATION_STATE_CROUCH
   		}
   		if( PRESSED_KEYS[ KEY_RIGHT ] || PRESSED_KEYS[ KEY_D ] ) {
-  			this.speedX = this.accelerationX
+  			this.speedX = this.accelerationX * (this.seatFlag ? 0.5 : 1)
         this.x += this.speedX * dt
         this.direction = 1
+        if(this.seatFlag)newState = ANIMATION_STATE_CROUCH
   		}
 
       //JUMP
   		if( PRESSED_KEYS[KEY_SPACE] && this.onFloor){
         newState = ANIMATION_STATE_JUMP_READY
-        this.onFloor -= 1
+        this.onFloor = false
   		}
+
     }
 
     //PHYSICS
@@ -367,12 +403,12 @@ class Hero extends Alive{
     if(newState == 0){
       if(this.speedY > 0){
         newState = ANIMATION_STATE_FALL
-  		}else if(this.speedY < 0){
+      }else if(this.speedY < 0){
   			newState = ANIMATION_STATE_JUMP
   		}else	if(this.speedY == 0 && landingFlag && !this.onFloor){
         newState = ANIMATION_STATE_JUMP_END
       }else if(this.speedX != 0){
-  			newState = ANIMATION_STATE_RUN
+        newState = ANIMATION_STATE_RUN
   		}
     }
 
