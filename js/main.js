@@ -64,11 +64,16 @@ TEXTURE_LIST["ground"] = new Texture(DATA_PATH + "ground_forest_1.png")
 
 TEXTURE_LIST["dwarf_stay"] = new AnimationTexture(DATA_PATH + "dwarf_stay.png", 8)
 TEXTURE_LIST["dwarf_run"] = new AnimationTexture(DATA_PATH + "dwarf_walk.png", 6)
+TEXTURE_LIST["dwarf_fall"] = new AnimationTexture(DATA_PATH + "dwarf_fall.png", 1)
 
 TEXTURE_LIST["dwarf_jump_ready"] = new AnimationTexture(DATA_PATH + "dwarf_jump_ready.png", 2)
 TEXTURE_LIST["dwarf_jump"] = new AnimationTexture(DATA_PATH + "dwarf_jump.png", 2, 20)
-TEXTURE_LIST["dwarf_fall"] = new AnimationTexture(DATA_PATH + "dwarf_fall.png", 1)
 TEXTURE_LIST["dwarf_jump_end"] = new AnimationTexture(DATA_PATH + "dwarf_stand_up.png", 2)
+
+TEXTURE_LIST["dwarf_siting"] = new AnimationTexture(DATA_PATH + "dwarf_siting.png", 3)
+TEXTURE_LIST["dwarf_seat"] = new AnimationTexture(DATA_PATH + "dwarf_seat.png", 1)
+TEXTURE_LIST["dwarf_crouch"] = new AnimationTexture(DATA_PATH + "dwarf_crouch.png", 5)
+TEXTURE_LIST["dwarf_uping"] = new AnimationTexture(DATA_PATH + "dwarf_uping.png", 3)
 
 //load waiting
 let texture = TEXTURE_LIST["dwarf_stay"]
@@ -100,7 +105,7 @@ function initial(){
 	window.hero = new Hero(100, 100, PIXEL_SCALE, "dwarf")
 	LIFELESSES.push(new Sprite(100, 400, PIXEL_SCALE, "ground"))
 	LIFELESSES.push(new Sprite(200, 300, PIXEL_SCALE, "ground"))
-        LIFELESSES.push(new Sprite(100, 600, PIXEL_SCALE, "ground"))
+	LIFELESSES.push(new Sprite(100, 600, PIXEL_SCALE, "ground"))
 	BACKGROUNDS.push(new Sprite(0, 0, PIXEL_SCALE ,"background"))
 
 	window.lastTime = Date.now()
