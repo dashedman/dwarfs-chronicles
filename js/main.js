@@ -8,10 +8,10 @@ frameID = undefined
 
 var canvas = document.getElementById("viewport")
 var ctx = canvas.getContext('2d')
-canvas.width = 1280
-canvas.height = 720
+canvas.width = 960
+canvas.height = 540
 
-if(window.innerWidth>window.innerHeight){
+if(window.innerWidth*9 > window.innerHeight*16){
 	canvas.style.width = window.innerHeight * 16 / 9
 	canvas.style.height = window.innerHeight
 }else{
@@ -45,12 +45,12 @@ window.addEventListener('focus', function() {
 });
 
 window.addEventListener("resize", function() {
-	if(window.innerWidth>window.innerHeight){
+	if(window.innerWidth*9 > window.innerHeight*16){
 		canvas.style.width = window.innerHeight * 16 / 9
 		canvas.style.height = window.innerHeight
 	}else{
 		canvas.style.width = window.innerWidth
-		canvas.style.height = window.innerWidth * 9 / 16
+		canvas.style.height = window.innerWidth * 9/16
 	}
 
 })
@@ -135,8 +135,9 @@ function render(){
 
 	if(DEBUG){
 		ctx.strokeStyle = "blue"
-		ctx.strokeText(canvas.width+" "+canvas.height,20,20)
-		ctx.strokeText(frameID,20,30)
+		ctx.strokeText(canvas.style.width+" "+canvas.style.height,20,20)
+		ctx.strokeText(canvas.width+" "+canvas.height,20,30)
+		ctx.strokeText(frameID,20,40)
 		ctx.strokeStyle = "yellow"
 	}
 }
