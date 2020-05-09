@@ -10,6 +10,7 @@ const TIME_BOOSTER = 1 //WARNING!!!
 
 //arrays
 const PRESSED_KEYS = new Array(128)
+const ONCE_PRESSED_KEYS = new Set()
 const LIFELESSES = []
 const BACKGROUNDS = []
 const ALIVES = []
@@ -21,6 +22,8 @@ const STATE_STAY
 //*/
 
 //animation states
+const ANIMATION_STATE_COUNTER = 7
+
 const ANIMATION_STATE_STAY = 0
 const ANIMATION_STATE_FALL = 1
 const ANIMATION_STATE_WALK = 2

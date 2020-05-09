@@ -29,7 +29,13 @@ class Entity{
 
     if(DEBUG)this.collideFlag = false
   }
+
 	collide(obj){
+    //objects normal face vector
+    let normalX = 0
+    let normalY = 0
+
+    //type of collision switch
 		switch(this.type){
 			case TYPE_BOX:
 				switch (obj.type) {
@@ -40,7 +46,7 @@ class Entity{
   							obj.y+obj.height < this.y ||
   							obj.y > this.y+this.height){
                   if(DEBUG)this.collideFlag = false
-                  return
+                  return [0,0]//no collision
                 }
 
 
@@ -49,43 +55,80 @@ class Entity{
             let dcX = (this.x-obj.x)+(this.width-obj.width)*0.5
             let dcY = (this.y-obj.y)+(this.height-obj.height)*0.5
 
+
             if(dcY>0){
 
               if( dcX>0 && (obj.x+obj.width-this.x)<(obj.y+obj.height-this.y) ){
+                //rigth collision for obj
   							obj.x = this.x-obj.width
                 obj.speedX=0
+
+                normalX = 1
+                normalY = 0
   						}else if(dcX<0 && (this.x+this.width-obj.x)<(obj.y+obj.height-this.y) ){
+                //left collision for obj
   							obj.x = this.x+this.width
                 obj.speedX=0
+
+                normalX = -1
+                normalY = 0
   						}else if( this.x+this.width-obj.x  && obj.x+obj.width-this.x){
+                //bottom collision for obj
                 obj.speedY = 0
   							obj.y = this.y - obj.height
-  							obj.onFloor = 1
+
+                normalX = 0
+                normalY = 1
               }
 
 						}else if(dcY<0){
 
               if(dcX>0 && (obj.x+obj.width-this.x)<(this.y+this.height-obj.y) ){
+                //rigth collision for obj
   							obj.x = this.x-obj.width
+                obj.speedX=0
+
+                normalX = 1
+                normalY = 0
   						}else if(dcX<0 && (this.x+this.width-obj.x)<(this.y+this.height-obj.y) ){
+                //left collision for obj
   							obj.x = this.x+this.width
+                obj.speedX=0
+
+                normalX = -1
+                normalY = 0
   						}else if( this.x+this.width-obj.x  && obj.x+obj.width-this.x){
+                //top collision for obj
                 obj.y = this.y + this.height
   							obj.speedY = 0
-                obj.onFloor = 0
+
+                normalX = 0
+                normalY = -1
               }
 
 						}else{
               if(dcX>0){
-                obj.x = this.x-obj.width
+                //rigth collision for obj
+  							obj.x = this.x-obj.width
+                obj.speedX=0
+
+                normalX = 1
+                normalY = 0
               }else if(dcX<0){
-                obj.x = this.x+this.width
+                //left collision for obj
+  							obj.x = this.x+this.width
+                obj.speedX=0
+
+                normalX = -1
+                normalY = 0
               }
             }
 						break
 				}
 				break
-		}
+		}//switch end
+
+    return [normalX,normalY]
 	}
 }
 
@@ -172,18 +215,19 @@ class Alive extends Entity{
     this.speedY = 0
 		this.accelerationX = 200
     this.jumpPower = 0.5
-		this.onFloor = 0
+    this.onFloor = 0
     this.direction = 1
 
     this.entityState = ANIMATION_STATE_STAY
     this.frameStatus = 0
 
-    this.animationList = new Array(4)
+    this.animationList = new Array(ANIMATION_STATE_COUNTER)
     this.animationList[ANIMATION_STATE_STAY] = TEXTURE_LIST[source_path+"_stay"]
     this.animationList[ANIMATION_STATE_FALL] = TEXTURE_LIST[source_path+"_fall"]
     this.animationList[ANIMATION_STATE_RUN] = TEXTURE_LIST[source_path+"_run"]
     this.animationList[ANIMATION_STATE_JUMP_READY] = TEXTURE_LIST[source_path+"_jump_ready"]
     this.animationList[ANIMATION_STATE_JUMP] = TEXTURE_LIST[source_path+"_jump"]
+    this.animationList[ANIMATION_STATE_JUMP_END] = TEXTURE_LIST[source_path+"_jump_end"]
 
     this.curentAnimation = this.animationList[ANIMATION_STATE_STAY]
 
@@ -231,7 +275,7 @@ class Alive extends Entity{
                         this.height)
     		ctx.strokeText("x:"+this.x+" y:"+this.y,this.x+dx,this.y+dy-25)
     		ctx.strokeText("dx:"+this.speedX+" dy:"+this.speedY,this.x+dx,this.y+dy-15)
-        ctx.strokeText("state:"+this.entityState+" frame"+this.frameStatus,this.x+dx,this.y+dy-5)
+        ctx.strokeText("state:"+this.entityState+" frame:"+this.frameStatus,this.x+dx,this.y+dy-5)
       }
     }
 
@@ -259,21 +303,28 @@ class Hero extends Alive{
     super(x,y,s,source_path,type)
   }
   update = function(dt){
-    //flags
-    var newFlag = false
-		var fallFlag = false
-    var newState = 0
+    let newState = 0
+    let landingFlag = false
 
     //state check
     switch(this.entityState){
+
       case ANIMATION_STATE_JUMP_READY:
         if(this.frameStatus > (this.curentAnimation.frames-1) * this.curentAnimation.frameSpeed){
           newState = ANIMATION_STATE_JUMP
           this.speedY = -this.jumpPower * GRAVITY
-          this.onFloor -= 1
-        }else newState = ANIMATION_STATE_JUMP_READY
+        }
+        else newState = ANIMATION_STATE_JUMP_READY
         break
-    }
+
+      case ANIMATION_STATE_JUMP_END:
+        if(this.frameStatus > (this.curentAnimation.frames-1) * this.curentAnimation.frameSpeed){
+          this.onFloor = 1
+        }
+        else newState = ANIMATION_STATE_JUMP_END
+        break
+
+    }//switch end
 
     //event check
     if(newState == 0){
@@ -291,8 +342,9 @@ class Hero extends Alive{
   		}
 
       //JUMP
-  		if( PRESSED_KEYS[KEY_SPACE]){// && this.onFloor){
+  		if( PRESSED_KEYS[KEY_SPACE] && this.onFloor){
         newState = ANIMATION_STATE_JUMP_READY
+        this.onFloor -= 1
   		}
     }
 
@@ -300,15 +352,26 @@ class Hero extends Alive{
 		this.speedY = this.speedY + dt * GRAVITY
 		this.y += this.speedY * dt
 		for(let i=0;i<LIFELESSES.length;i++){
-			LIFELESSES[i].collide(this)
+      //collides
+			let [normalX,normalY] = LIFELESSES[i].collide(this)
+
+      if(normalX || normalY){
+        if(normalY>0){
+          landingFlag = true
+        }
+      }
 		}
+
+
 
     if(newState == 0){
       if(this.speedY > 0){
         newState = ANIMATION_STATE_FALL
   		}else if(this.speedY < 0){
   			newState = ANIMATION_STATE_JUMP
-  		}else	if(this.speedX != 0){
+  		}else	if(this.speedY == 0 && landingFlag && !this.onFloor){
+        newState = ANIMATION_STATE_JUMP_END
+      }else if(this.speedX != 0){
   			newState = ANIMATION_STATE_RUN
   		}
     }

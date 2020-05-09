@@ -27,6 +27,7 @@ PRESSED_KEYS.fill(false)
 
 document.addEventListener('keydown', function(event) {
 	PRESSED_KEYS[event.keyCode] = true
+	ONCE_PRESSED_KEYS.add(event.keyCode)
 });
 document.addEventListener('keyup', function(event) {
 	PRESSED_KEYS[event.keyCode] = false
@@ -67,6 +68,7 @@ TEXTURE_LIST["dwarf_run"] = new AnimationTexture(DATA_PATH + "dwarf_walk.png", 6
 TEXTURE_LIST["dwarf_jump_ready"] = new AnimationTexture(DATA_PATH + "dwarf_jump_ready.png", 2)
 TEXTURE_LIST["dwarf_jump"] = new AnimationTexture(DATA_PATH + "dwarf_jump.png", 2, 20)
 TEXTURE_LIST["dwarf_fall"] = new AnimationTexture(DATA_PATH + "dwarf_fall.png", 1)
+TEXTURE_LIST["dwarf_jump_end"] = new AnimationTexture(DATA_PATH + "dwarf_stand_up.png", 2)
 
 //load waiting
 let texture = TEXTURE_LIST["dwarf_stay"]
@@ -95,10 +97,10 @@ function initial(){
 	ctx.strokeStyle = "yellow"
 	ctx.imageSmoothingEnabled = false
 
-	window.hero = new Hero(100,100,PIXEL_SCALE,"dwarf")
-	LIFELESSES.push(new Sprite(100,400,PIXEL_SCALE,"ground"))
-	LIFELESSES.push(new Sprite(200,300,PIXEL_SCALE,"ground"))
-	BACKGROUNDS.push(new Sprite(0,0,PIXEL_SCALE,"background"))
+	window.hero = new Hero(100, 100, PIXEL_SCALE, "dwarf")
+	LIFELESSES.push(new Sprite(100, 400, PIXEL_SCALE, "ground"))
+	LIFELESSES.push(new Sprite(200, 300, PIXEL_SCALE, "ground"))
+	BACKGROUNDS.push(new Sprite(0, 0, PIXEL_SCALE ,"background"))
 
 	window.lastTime = Date.now()
 	window.frameID = requestAnimationFrame(frame);
@@ -147,6 +149,7 @@ function frame(){
 	update(dt*TIME_BOOSTER)
 	render()
 
+	ONCE_PRESSED_KEYS.clear()
 	lastTime = now
 	frameID=requestAnimationFrame(frame)
 }
