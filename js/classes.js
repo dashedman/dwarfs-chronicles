@@ -288,8 +288,8 @@ class Hero extends Alive{
   }
   update = function(dt){
     let newState = 0
+    let runFlag = false
     let landingFlag = false
-    let tonelFlag = false
 
     //state check
     switch(this.entityState){
@@ -329,29 +329,37 @@ class Hero extends Alive{
     //event check
     if(newState == 0){
 
+      //WALK
+      this.speedX = 0
+  		if( PRESSED_KEYS[ KEY_LEFT ] || PRESSED_KEYS[ KEY_A ] ) {
+        runFlag = !runFlag
+        this.direction = -1
+  		}
+  		if( PRESSED_KEYS[ KEY_RIGHT ] || PRESSED_KEYS[ KEY_D ] ) {
+        runFlag = !runFlag
+        this.direction = 1
+  		}
+
       //SEAT
       if( (PRESSED_KEYS[ KEY_DOWN ] || PRESSED_KEYS[ KEY_S ]) && this.onFloor) {
         if(!this.seatFlag){
           newState = ANIMATION_STATE_SITING
-        }else{
-          newState = ANIMATION_STATE_SEAT
         }
-  		}
+  		}else if(this.seatFlag){
+        newState = ANIMATION_STATE_UPING
 
-      //WALK
-      this.speedX = 0
-  		if( PRESSED_KEYS[ KEY_LEFT ] || PRESSED_KEYS[ KEY_A ] ) {
-  			this.speedX = -this.accelerationX * (this.seatFlag ? 0.5 : 1)
-  			this.x += this.speedX * dt
-        this.direction = -1
-        if(this.seatFlag)newState = ANIMATION_STATE_CROUCH
-  		}
-  		if( PRESSED_KEYS[ KEY_RIGHT ] || PRESSED_KEYS[ KEY_D ] ) {
-  			this.speedX = this.accelerationX * (this.seatFlag ? 0.5 : 1)
-        this.x += this.speedX * dt
-        this.direction = 1
-        if(this.seatFlag)newState = ANIMATION_STATE_CROUCH
-  		}
+        let tmpY = this.animationList[ANIMATION_STATE_STAY].data.height * this.s
+        for(let shape of LIFELESSES){
+          if( shape.x < this.x+this.width &&
+              shape.x+shape.width > this.x &&
+              shape.y+shape.height >= tmpY &&
+              shape.y+shape.height < this.y){
+
+            newState = 0
+            break
+          }
+        }
+      }
 
       //JUMP
   		if( PRESSED_KEYS[KEY_SPACE] && this.onFloor && !this.seatFlag){
@@ -362,12 +370,16 @@ class Hero extends Alive{
     }
 
     //PHYSICS
+    if(runFlag){
+      this.speedX = this.accelerationX * (this.seatFlag ? 0.5 : 1) * this.direction
+      this.x += this.speedX * dt
+    }
 		this.speedY = this.speedY + dt * GRAVITY
 		this.y += this.speedY * dt
+
 		for(let shape of LIFELESSES){
       //collides
 			let [normalX,normalY] = shape.collide(this)
-
       if(normalX || normalY){
 
         if(normalY > 0){
@@ -392,32 +404,19 @@ class Hero extends Alive{
 
 
 
-    if(newState == 0){
+    if(!newState){
       if(this.speedY > 0){
         newState = ANIMATION_STATE_FALL
       }else if(this.speedY < 0){
   			newState = ANIMATION_STATE_JUMP
-  		}else	if(this.speedY == 0 && landingFlag && !this.onFloor){
+  		}else	if(landingFlag && !this.onFloor){
         newState = ANIMATION_STATE_JUMP_END
-      }else if(this.seatFlag && !tonelFlag && newState != ANIMATION_STATE_SEAT){
-        newState = ANIMATION_STATE_UPING
-
-        //in tonel and try to uping
-        let tmpY = this.animationList[ANIMATION_STATE_STAY].data.height * this.s
-        for(let shape of LIFELESSES){
-          if( shape.x < this.x+this.width &&
-              shape.x+shape.width > this.x &&
-              shape.y+shape.height >= tmpY &&
-              shape.y+shape.height < this.y){
-                
-            newState = ANIMATION_STATE_SEAT
-            break
-          }
-        }
-
-      }else if(this.speedX != 0){
-        newState = ANIMATION_STATE_RUN
-  		}
+      }else if(runFlag != 0){
+        if(this.seatFlag) newState = ANIMATION_STATE_CROUCH
+        else newState = ANIMATION_STATE_RUN
+  		}else if(this.seatFlag){
+        newState = ANIMATION_STATE_SEAT
+      }
     }
 
     if(this.entityState != newState){
