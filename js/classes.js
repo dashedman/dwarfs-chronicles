@@ -379,15 +379,12 @@ class Hero extends Alive{
           this.speedY = 0
         }
 
-        if(this.seatFlag && shape.y<this.y) newState = ANIMATION_STATE_SEAT
-        else{
-          if(normalX > 0){
-            this.x = shape.x - this.width
-            this.speedX = 0
-          }else if(normalX < 0){
-            this.x = shape.x + shape.width
-            this.speedX = 0
-          }
+        if(normalX > 0){
+          this.x = shape.x - this.width
+          this.speedX = 0
+        }else if(normalX < 0){
+          this.x = shape.x + shape.width
+          this.speedX = 0
         }
 
       }
@@ -404,6 +401,20 @@ class Hero extends Alive{
         newState = ANIMATION_STATE_JUMP_END
       }else if(this.seatFlag && !tonelFlag && newState != ANIMATION_STATE_SEAT){
         newState = ANIMATION_STATE_UPING
+
+        //in tonel and try to uping
+        let tmpY = this.animationList[ANIMATION_STATE_STAY].data.height * this.s
+        for(let shape of LIFELESSES){
+          if( shape.x < this.x+this.width &&
+              shape.x+shape.width > this.x &&
+              shape.y+shape.height >= tmpY &&
+              shape.y+shape.height < this.y){
+                
+            newState = ANIMATION_STATE_SEAT
+            break
+          }
+        }
+
       }else if(this.speedX != 0){
         newState = ANIMATION_STATE_RUN
   		}
