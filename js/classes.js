@@ -90,7 +90,7 @@ class Entity{
                 normalY = -1
               }
 
-						}else{
+						}else if(dcY == 0){
               if(dcX>0){
                 //rigth collision for obj
                 normalX = 1
