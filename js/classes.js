@@ -181,6 +181,7 @@ class Alive extends Entity{
     this.animationList[ANIMATION_STATE_STAY] = TEXTURE_LIST[source_path+"_stay"]
     this.animationList[ANIMATION_STATE_FALL] = TEXTURE_LIST[source_path+"_fall"]
     this.animationList[ANIMATION_STATE_RUN] = TEXTURE_LIST[source_path+"_run"]
+    this.animationList[ANIMATION_STATE_JUMP_READY] = TEXTURE_LIST[source_path+"_jump_ready"]
     this.animationList[ANIMATION_STATE_JUMP] = TEXTURE_LIST[source_path+"_jump"]
 
     this.curentAnimation = this.animationList[ANIMATION_STATE_STAY]
@@ -190,6 +191,7 @@ class Alive extends Entity{
   }
 
   stateUpdate(newState){
+    this.frameStatus=0
     this.entityState = newState
     this.curentAnimation = this.animationList[this.entityState]
 
@@ -256,62 +258,62 @@ class Hero extends Alive{
     super(x,y,s,source_path,type)
   }
   update = function(dt){
+    //flags
     var newFlag = false
-		var runFlag = false
 		var fallFlag = false
+    var newState = 0
 
-    //ХОДИТ
-    this.speedX = 0
-		if( PRESSED_KEYS[ KEY_LEFT ] || PRESSED_KEYS[ KEY_A ] ) {
-			runFlag = true
-			this.speedX = -100
-			this.x += this.speedX * dt
-      this.direction = -1
-		}
-		if( PRESSED_KEYS[ KEY_RIGHT ] || PRESSED_KEYS[ KEY_D ] ) {
-			runFlag = true
-			this.speedX = 100
-      this.x += this.speedX * dt
-      this.direction = 1
-		}
+    //state check
+    switch(this.entityState){
+      case ANIMATION_STATE_JUMP_READY:
+        if(this.frameStatus > (this.curentAnimation.frames-1) * this.curentAnimation.frameSpeed){
+          newState = ANIMATION_STATE_JUMP
+          this.speedY = -this.jumpPower * GRAVITY
+          this.onFloor -= 1
+        }else newState = ANIMATION_STATE_JUMP_READY
+        break
+    }
 
-      //Физика прыжжка
-		if( PRESSED_KEYS[KEY_SPACE]){// && this.onFloor){
-			this.speedY = -this.jumpPower * GRAVITY
-			//this.onFloor -= 1
-		}
+    //event check
+    if(newState == 0){
+      //WALK
+      this.speedX = 0
+  		if( PRESSED_KEYS[ KEY_LEFT ] || PRESSED_KEYS[ KEY_A ] ) {
+  			this.speedX = -100
+  			this.x += this.speedX * dt
+  		}
+  		if( PRESSED_KEYS[ KEY_RIGHT ] || PRESSED_KEYS[ KEY_D ] ) {
+  			this.speedX = 100
+        this.x += this.speedX * dt
+  		}
+
+      //JUMP
+  		if( PRESSED_KEYS[KEY_SPACE]){// && this.onFloor){
+        newState = ANIMATION_STATE_JUMP_READY
+  		}
+    }
+
+    //PHYSICS
 		this.speedY = this.speedY + dt * GRAVITY
 		this.y += this.speedY * dt
-
 		for(let i=0;i<LIFELESSES.length;i++){
 			LIFELESSES[i].collide(this)
 		}
 
-		if(this.speedY>0){
-			if(this.entityState != ANIMATION_STATE_FALL){
-				newFlag = true
-				this.stateUpdate(ANIMATION_STATE_FALL)
-			}
-		}
-		else if(this.speedY<0){
-			if(this.entityState != ANIMATION_STATE_JUMP){
-				newFlag = true
-				this.stateUpdate(ANIMATION_STATE_JUMP)
-			}
-		}else	if(runFlag){
-			if(this.entityState != ANIMATION_STATE_RUN){
-				newFlag = true
-        this.stateUpdate(ANIMATION_STATE_RUN)
-			}
-		}else{
-			if(this.entityState != ANIMATION_STATE_STAY){
-				newFlag = true
-        this.stateUpdate(ANIMATION_STATE_STAY)
-			}
-		}
+    if(newState == 0){
+      if(this.speedY > 0){
+        newState = ANIMATION_STATE_FALL
+  		}else if(this.speedY < 0){
+  			newState = ANIMATION_STATE_JUMP
+  		}else	if(this.speedX != 0){
+  			newState = ANIMATION_STATE_RUN
+  		}
+    }
 
-    if(newFlag) this.frameStatus=0;
-    else this.frameStatus = (this.frameStatus+dt*100)%(this.curentAnimation.frames*this.curentAnimation.frameSpeed)
+    if(this.entityState != newState){
+      this.stateUpdate(newState)
+    }else this.frameStatus = (this.frameStatus+dt*100)
+                              %(this.curentAnimation.frames*this.curentAnimation.frameSpeed)
 
 	}
 }

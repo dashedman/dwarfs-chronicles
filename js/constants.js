@@ -6,7 +6,7 @@ const DEBUG = true
 
 //physics
 const GRAVITY = 1000
-const TIME_BOOSTER = 1
+const TIME_BOOSTER = 1 //WARNING!!!
 
 //arrays
 const PRESSED_KEYS = new Array(128)
@@ -15,11 +15,19 @@ const BACKGROUNDS = []
 const ALIVES = []
 const TEXTURE_LIST = new Map()
 
+/*
+//alive states
+const STATE_STAY
+//*/
+
 //animation states
-const ANIMATION_STATE_STAY=0
-const ANIMATION_STATE_FALL=1
-const ANIMATION_STATE_RUN=2
-const ANIMATION_STATE_JUMP=3
+const ANIMATION_STATE_STAY = 0
+const ANIMATION_STATE_FALL = 1
+const ANIMATION_STATE_WALK = 2
+const ANIMATION_STATE_RUN = 3
+const ANIMATION_STATE_JUMP_READY = 4
+const ANIMATION_STATE_JUMP = 5
+const ANIMATION_STATE_JUMP_END = 6
 
 //block types
 const TYPE_BOX = 0
