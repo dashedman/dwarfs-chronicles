@@ -62,23 +62,14 @@ class Entity{
 
               if( dcX>0 && (obj.x+obj.width-this.x)<=(obj.y+obj.height-this.y) ){
                 //rigth collision for obj
-  							obj.x = this.x-obj.width
-                obj.speedX=0
-
                 normalX = 1
                 normalY = 0
   						}else if(dcX<0 && (this.x+this.width-obj.x)<=(obj.y+obj.height-this.y) ){
                 //left collision for obj
-  							obj.x = this.x+this.width
-                obj.speedX=0
-
                 normalX = -1
                 normalY = 0
   						}else if( this.x+this.width-obj.x  && obj.x+obj.width-this.x){
                 //bottom collision for obj
-                obj.speedY = 0
-  							obj.y = this.y - obj.height
-
                 normalX = 0
                 normalY = 1
               }
@@ -87,23 +78,14 @@ class Entity{
 
               if(dcX>0 && (obj.x+obj.width-this.x)<=(this.y+this.height-obj.y) ){
                 //rigth collision for obj
-  							obj.x = this.x-obj.width
-                obj.speedX=0
-
                 normalX = 1
                 normalY = 0
   						}else if(dcX<0 && (this.x+this.width-obj.x)<=(this.y+this.height-obj.y) ){
                 //left collision for obj
-  							obj.x = this.x+this.width
-                obj.speedX=0
-
                 normalX = -1
                 normalY = 0
   						}else if( this.x+this.width-obj.x  && obj.x+obj.width-this.x){
                 //top collision for obj
-                obj.y = this.y + this.height
-  							obj.speedY = 0
-
                 normalX = 0
                 normalY = -1
               }
@@ -111,16 +93,10 @@ class Entity{
 						}else{
               if(dcX>0){
                 //rigth collision for obj
-  							obj.x = this.x-obj.width
-                obj.speedX=0
-
                 normalX = 1
                 normalY = 0
               }else if(dcX<0){
                 //left collision for obj
-  							obj.x = this.x+this.width
-                obj.speedX=0
-
                 normalX = -1
                 normalY = 0
               }
@@ -313,6 +289,7 @@ class Hero extends Alive{
   update = function(dt){
     let newState = 0
     let landingFlag = false
+    let tonelFlag = false
 
     //state check
     switch(this.entityState){
@@ -353,15 +330,13 @@ class Hero extends Alive{
     if(newState == 0){
 
       //SEAT
-      if( PRESSED_KEYS[ KEY_DOWN ] || PRESSED_KEYS[ KEY_S ] ) {
+      if( (PRESSED_KEYS[ KEY_DOWN ] || PRESSED_KEYS[ KEY_S ]) && this.onFloor) {
         if(!this.seatFlag){
           newState = ANIMATION_STATE_SITING
         }else{
           newState = ANIMATION_STATE_SEAT
         }
-  		}else{
-        if(this.seatFlag)newState = ANIMATION_STATE_UPING
-      }
+  		}
 
       //WALK
       this.speedX = 0
@@ -379,7 +354,7 @@ class Hero extends Alive{
   		}
 
       //JUMP
-  		if( PRESSED_KEYS[KEY_SPACE] && this.onFloor){
+  		if( PRESSED_KEYS[KEY_SPACE] && this.onFloor && !this.seatFlag){
         newState = ANIMATION_STATE_JUMP_READY
         this.onFloor = false
   		}
@@ -389,14 +364,32 @@ class Hero extends Alive{
     //PHYSICS
 		this.speedY = this.speedY + dt * GRAVITY
 		this.y += this.speedY * dt
-		for(let i=0;i<LIFELESSES.length;i++){
+		for(let shape of LIFELESSES){
       //collides
-			let [normalX,normalY] = LIFELESSES[i].collide(this)
+			let [normalX,normalY] = shape.collide(this)
 
       if(normalX || normalY){
-        if(normalY>0){
+
+        if(normalY > 0){
+          this.speedY = 0
+          this.y = shape.y - this.height
           landingFlag = true
+        }else if(normalY < 0){
+          this.y = shape.y + shape.height
+          this.speedY = 0
         }
+
+        if(this.seatFlag && shape.y<this.y) newState = ANIMATION_STATE_SEAT
+        else{
+          if(normalX > 0){
+            this.x = shape.x - this.width
+            this.speedX = 0
+          }else if(normalX < 0){
+            this.x = shape.x + shape.width
+            this.speedX = 0
+          }
+        }
+
       }
 		}
 
@@ -409,6 +402,8 @@ class Hero extends Alive{
   			newState = ANIMATION_STATE_JUMP
   		}else	if(this.speedY == 0 && landingFlag && !this.onFloor){
         newState = ANIMATION_STATE_JUMP_END
+      }else if(this.seatFlag && !tonelFlag && newState != ANIMATION_STATE_SEAT){
+        newState = ANIMATION_STATE_UPING
       }else if(this.speedX != 0){
         newState = ANIMATION_STATE_RUN
   		}

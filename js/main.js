@@ -104,11 +104,11 @@ function initial(){
 
 	window.hero = new Hero(100, 100, PIXEL_SCALE, "dwarf")
 
-
+	LIFELESSES.push(new Sprite(200, 297, PIXEL_SCALE, "ground"))
 	LIFELESSES.push(new Sprite(100, 400, PIXEL_SCALE, "ground"))
 	LIFELESSES.push(new Sprite(100, 600, PIXEL_SCALE, "ground"))
 	LIFELESSES.push(new Sprite(300, 200, PIXEL_SCALE, "ground"))
-	LIFELESSES.push(new Sprite(200, 301, PIXEL_SCALE, "ground"))
+
 	BACKGROUNDS.push(new Sprite(0, 0, PIXEL_SCALE ,"background"))
 
 	window.lastTime = Date.now()
