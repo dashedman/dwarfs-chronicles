@@ -50,57 +50,74 @@ class Entity{
                 }
 
 
-                if(DEBUG){
-                  this.collideFlag = true
-                }
+            if(DEBUG){
+              this.collideFlag = true
+            }
+
 						//collision reaction
             let dcX = (this.x-obj.x)+(this.width-obj.width)*0.5
             let dcY = (this.y-obj.y)+(this.height-obj.height)*0.5
 
+            if(dcY>0){
 
-            if(dcY>0 && obj.speedY>0){
+              if( dcX>0 ){
+                if( cross(obj.speedX, obj.speedY,
+                          this.x-obj.x-obj.width, this.y-obj.y-obj.height) <= 0 ){
+                  //rigth collision for obj
+                  normalX = 1
+                  normalY = 0
+                }else{
+                  //bottom collision for obj
+                  normalX = 0
+                  normalY = 1
+                }
 
-              if( dcX>0 && (obj.x+obj.width-this.x)<=(obj.y+obj.height-this.y) ){
-                //rigth collision for obj
-                normalX = 1
-                normalY = 0
-  						}else if(dcX<0 && (this.x+this.width-obj.x)<=(obj.y+obj.height-this.y) ){
-                //left collision for obj
-                normalX = -1
-                normalY = 0
-  						}else if( this.x+this.width-obj.x  && obj.x+obj.width-this.x){
-                //bottom collision for obj
-                normalX = 0
-                normalY = 1
-              }
+  						}else{
+                if( cross(obj.speedX, obj.speedY,
+                          this.x+this.width-obj.x, this.y-obj.y-obj.height) >= 0 ){
+                  //left collision for obj
+                  normalX = -1
+                  normalY = 0
+                }else{
+                  //bottom collision for obj
+                  normalX = 0
+                  normalY = 1
+                }
 
-						}else if(dcY<0 && obj.speedY<0){
+  						}
 
-              if(dcX>0 && (obj.x+obj.width-this.x)<=(this.y+this.height-obj.y) ){
-                //rigth collision for obj
-                normalX = 1
-                normalY = 0
-  						}else if(dcX<0 && (this.x+this.width-obj.x)<=(this.y+this.height-obj.y) ){
-                //left collision for obj
-                normalX = -1
-                normalY = 0
-  						}else if( this.x+this.width-obj.x  && obj.x+obj.width-this.x){
-                //top collision for obj
-                normalX = 0
-                normalY = -1
-              }
-
-						}else if(dcY == 0){
+						}else{
+              //top collision for obj
+              /*
+              normalX = 0
+              normalY = -1
+              */
               if(dcX>0){
-                //rigth collision for obj
-                normalX = 1
-                normalY = 0
-              }else if(dcX<0){
-                //left collision for obj
-                normalX = -1
-                normalY = 0
-              }
-            }
+                if( cross(obj.speedX, obj.speedY,
+                          this.x-obj.x-obj.width, this.y+this.height-obj.y) >= 0 ){
+                  //rigth collision for obj
+                  normalX = 1
+                  normalY = 0
+                }else{
+                  //top collision for obj
+                  normalX = 0
+                  normalY = -1
+                }
+
+  						}else{
+                if( cross(obj.speedX, obj.speedY,
+                          this.x+this.width-obj.x, this.y+this.height-obj.y) <= 0 ){
+                  //left collision for obj
+                  normalX = -1
+                  normalY = 0
+                }else{
+                  //top collision for obj
+                  normalX = 0
+                  normalY = -1
+                }
+
+  						}
+						}
 						break
 				}
 				break
@@ -377,36 +394,42 @@ class Hero extends Alive{
 		this.speedY = this.speedY + dt * GRAVITY
 		this.y += this.speedY * dt
 
+    let stopSpeedXFlag = false
+    let stopSpeedYFlag = false
 		for(let shape of LIFELESSES){
       //collides
 			let [normalX,normalY] = shape.collide(this)
       if(normalX || normalY){
 
         if(normalY > 0){
-          this.speedY = 0
+          stopSpeedYFlag = true
           this.y = shape.y - this.height
           landingFlag = true
         }else if(normalY < 0){
           this.y = shape.y + shape.height
-          this.speedY = 0
+          stopSpeedYFlag = true
         }
 
         if(normalX > 0){
           this.x = shape.x - this.width
-          this.speedX = 0
+          stopSpeedXFlag = true
         }else if(normalX < 0){
           this.x = shape.x + shape.width
-          this.speedX = 0
+          stopSpeedXFlag = true
         }
 
       }
 		}
+
+    if(stopSpeedXFlag)this.speedX = 0
+    if(stopSpeedYFlag)this.speedY = 0
 
 
 
     if(!newState){
       if(this.speedY > 0){
         newState = ANIMATION_STATE_FALL
+        this.onFloor = false
       }else if(this.speedY < 0){
   			newState = ANIMATION_STATE_JUMP
   		}else	if(landingFlag && !this.onFloor){

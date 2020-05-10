@@ -11,13 +11,13 @@ var ctx = canvas.getContext('2d')
 canvas.width = 960
 canvas.height = 540
 
-/*if(window.innerWidth*9 > window.innerHeight*16){
+if(window.innerWidth*9 > window.innerHeight*16){
 	canvas.style.width = window.innerHeight * 16 / 9
 	canvas.style.height = window.innerHeight
 }else{
 	canvas.style.width = window.innerWidth
 	canvas.style.height = window.innerWidth * 9/16
-}*/
+}
 
 
 
@@ -154,12 +154,14 @@ function render(){
 
 function frame(){
 	let now = Date.now()
+	//if(frameID%5 == 0){
 	let dt = Math.min(100,now - lastTime)/1000
 
 	update(dt*TIME_BOOSTER)
 	render()
 
 	ONCE_PRESSED_KEYS.clear()
+//}
 	lastTime = now
 	frameID=requestAnimationFrame(frame)
 }
