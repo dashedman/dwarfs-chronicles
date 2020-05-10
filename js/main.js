@@ -151,11 +151,13 @@ function frame(){
 	let now = Date.now()
 	let dt = Math.min(100,now - lastTime)/1000
 
+	if(dt){
 	update(dt*TIME_BOOSTER)
 	render()
 
 	ONCE_PRESSED_KEYS.clear()
 
 	lastTime = now
+	}
 	frameID=requestAnimationFrame(frame)
 }
