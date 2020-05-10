@@ -184,7 +184,7 @@ class Alive extends Entity{
     this.speedX = 0
     this.speedY = 0
 		this.accelerationX = 200
-    this.jumpPower = 0.5
+    this.jumpPower = 0.6
     this.onFloor = 0
     this.direction = 1
     this.seatFlag = false
@@ -209,6 +209,20 @@ class Alive extends Entity{
 
     this.curentAnimation = this.animationList[ANIMATION_STATE_STAY]
 
+  }
+
+  inTonel(){
+    let tmpY = this.y + this.height - this.stay_height
+    for(let shape of LIFELESSES){
+      if( shape.x < this.x+this.width &&
+          shape.x+shape.width > this.x &&
+          shape.y+shape.height >= tmpY &&
+          shape.y+shape.height < this.y){
+
+        return true
+      }
+    }
+    return false
   }
 
   stateUpdate = function(newState){
@@ -352,20 +366,8 @@ class Hero extends Alive{
         if(!this.seatFlag){
           newState = ANIMATION_STATE_SITING
         }
-  		}else if(this.seatFlag){
-        newState = ANIMATION_STATE_UPING
-
-        let tmpY = this.y + this.height - this.animationList[ANIMATION_STATE_STAY].data.height * this.s
-        for(let shape of LIFELESSES){
-          if( shape.x < this.x+this.width &&
-              shape.x+shape.width > this.x &&
-              shape.y+shape.height >= tmpY &&
-              shape.y+shape.height < this.y){
-
-            newState = 0
-            break
-          }
-        }
+  		}else if(this.seatFlag && this.onFloor){
+        if(!this.inTonel())newState = ANIMATION_STATE_UPING
       }
 
       //JUMP
@@ -418,8 +420,10 @@ class Hero extends Alive{
 
     if(!newState){
       if(this.speedY > 0){
-        newState = ANIMATION_STATE_FALL
+        if(!this.inTonel())newState = ANIMATION_STATE_FALL
+        else newState = ANIMATION_STATE_SEAT
         this.onFloor = false
+        this.seatFlag = false
       }else if(this.speedY < 0){
   			newState = ANIMATION_STATE_JUMP
   		}else	if(landingFlag && !this.onFloor){

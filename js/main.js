@@ -4,6 +4,7 @@ requestAnimationFrame = window.requestAnimationFrame ||
 	window.oRequestAnimationFrame ||
 	window.msRequestAnimationFrame ||
 	function(callback){ window.setTimeout(callback, 66) }
+
 frameID = undefined
 
 var canvas = document.getElementById("viewport")
@@ -99,12 +100,12 @@ function initial(){
 	ctx.strokeStyle = "yellow"
 	ctx.imageSmoothingEnabled = false
 
-	window.hero = new Hero(100, 100, 20, 29, PIXEL_SCALE, "dwarf", 0, 22)
+	window.hero = new Hero(100, 100, 20, 29, PIXEL_SCALE, "dwarf", 0, 23)
 
-	LIFELESSES.push(new Sprite(200, 297, 450, 11, PIXEL_SCALE, "ground"))
-	LIFELESSES.push(new Sprite(100, 400, 450, 11, PIXEL_SCALE, "ground"))
+	LIFELESSES.push(new Sprite(200, 297, 100, 11, PIXEL_SCALE, "ground"))
+	LIFELESSES.push(new Sprite(100, 450, 450, 11, PIXEL_SCALE, "ground"))
 	LIFELESSES.push(new Sprite(100, 600, 450, 11, PIXEL_SCALE, "ground"))
-	LIFELESSES.push(new Sprite(300, 200, 450, 11, PIXEL_SCALE, "ground"))
+	LIFELESSES.push(new Sprite(300, 194, 150, 11, PIXEL_SCALE, "ground"))
 
 	BACKGROUNDS.push(new Sprite(0, 0, 450, 132, PIXEL_SCALE ,"background"))
 
@@ -120,8 +121,6 @@ function update(dt){
   for(let i=0;i<LIFELESSES.length;i++)LIFELESSES[i].update(dt)
   for(let i=0;i<BACKGROUNDS.length;i++)BACKGROUNDS[i].update(dt)
 }
-
-
 
 function render(){
 	let dx = (canvas.width - hero.width)*0.5 - hero.x
@@ -148,16 +147,16 @@ function render(){
 	}
 }
 
-
 function frame(){
 	let now = Date.now()
+	if(frameID%5 == 0){
 	let dt = Math.min(100,now - lastTime)/1000
 
 	update(dt*TIME_BOOSTER)
 	render()
 
 	ONCE_PRESSED_KEYS.clear()
-
+}
 	lastTime = now
 	frameID=requestAnimationFrame(frame)
 }
