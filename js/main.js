@@ -62,34 +62,31 @@ window.addEventListener("resize", function() {
 TEXTURE_LIST["background"] = new Texture(DATA_PATH + "background_forest_1.png")
 TEXTURE_LIST["ground"] = new Texture(DATA_PATH + "ground_forest_1.png")
 
-TEXTURE_LIST["dwarf_stay"] = new AnimationTexture(DATA_PATH + "dwarf_stay.png", 8)
-TEXTURE_LIST["dwarf_run"] = new AnimationTexture(DATA_PATH + "dwarf_walk.png", 6)
-TEXTURE_LIST["dwarf_fall"] = new AnimationTexture(DATA_PATH + "dwarf_fall.png", 1)
+TEXTURE_LIST["dwarf_stay"] = new Texture(DATA_PATH + "dwarf_stay.png", 8)
+TEXTURE_LIST["dwarf_run"] = new Texture(DATA_PATH + "dwarf_walk.png", 6)
+TEXTURE_LIST["dwarf_fall"] = new Texture(DATA_PATH + "dwarf_fall.png", 1)
 
-TEXTURE_LIST["dwarf_jump_ready"] = new AnimationTexture(DATA_PATH + "dwarf_jump_ready.png", 2)
-TEXTURE_LIST["dwarf_jump"] = new AnimationTexture(DATA_PATH + "dwarf_jump.png", 2, 20)
-TEXTURE_LIST["dwarf_jump_end"] = new AnimationTexture(DATA_PATH + "dwarf_stand_up.png", 2)
+TEXTURE_LIST["dwarf_jump_ready"] = new Texture(DATA_PATH + "dwarf_jump_ready.png", 2)
+TEXTURE_LIST["dwarf_jump"] = new Texture(DATA_PATH + "dwarf_jump.png", 2, 20)
+TEXTURE_LIST["dwarf_jump_end"] = new Texture(DATA_PATH + "dwarf_stand_up.png", 2)
 
-TEXTURE_LIST["dwarf_siting"] = new AnimationTexture(DATA_PATH + "dwarf_siting.png", 3)
-TEXTURE_LIST["dwarf_seat"] = new AnimationTexture(DATA_PATH + "dwarf_seat.png", 1)
-TEXTURE_LIST["dwarf_crouch"] = new AnimationTexture(DATA_PATH + "dwarf_crouch.png", 5)
-TEXTURE_LIST["dwarf_uping"] = new AnimationTexture(DATA_PATH + "dwarf_uping.png", 3)
+TEXTURE_LIST["dwarf_siting"] = new Texture(DATA_PATH + "dwarf_siting.png", 3)
+TEXTURE_LIST["dwarf_seat"] = new Texture(DATA_PATH + "dwarf_seat.png", 1)
+TEXTURE_LIST["dwarf_crouch"] = new Texture(DATA_PATH + "dwarf_crouch.png", 5)
+TEXTURE_LIST["dwarf_uping"] = new Texture(DATA_PATH + "dwarf_uping.png", 3)
 
 //load waiting
-let texture = TEXTURE_LIST["dwarf_stay"]
-
 
 let promisses = []
-for(let x in TEXTURE_LIST){
-	let texture = TEXTURE_LIST[x]
-	promisses.push(new Promise((resolve,reject)=>{
-		texture.data.addEventListener("load", ()=>{
-			if(texture.frameWidth)texture.frameWidth = Math.floor(texture.data.naturalWidth / texture.frames)
-			resolve()
-		},{once:true})
-
-	}))
+for(let key in TEXTURE_LIST){
+		let texture = TEXTURE_LIST[key]
+		promisses.push(new Promise((resolve,reject)=>{
+				texture.data.addEventListener("load", ()=>{
+					resolve()
+				},{once:true})
+		}))
 }
+
 Promise.all(promisses).then(initial).catch((e)=>{console.log(e)})
 
 
@@ -102,14 +99,14 @@ function initial(){
 	ctx.strokeStyle = "yellow"
 	ctx.imageSmoothingEnabled = false
 
-	window.hero = new Hero(100, 100, PIXEL_SCALE, "dwarf")
+	window.hero = new Hero(100, 100, 20, 29, PIXEL_SCALE, "dwarf", 0, 22)
 
-	LIFELESSES.push(new Sprite(200, 297, PIXEL_SCALE, "ground"))
-	LIFELESSES.push(new Sprite(100, 400, PIXEL_SCALE, "ground"))
-	LIFELESSES.push(new Sprite(100, 600, PIXEL_SCALE, "ground"))
-	LIFELESSES.push(new Sprite(300, 200, PIXEL_SCALE, "ground"))
+	LIFELESSES.push(new Sprite(200, 297, 450, 11, PIXEL_SCALE, "ground"))
+	LIFELESSES.push(new Sprite(100, 400, 450, 11, PIXEL_SCALE, "ground"))
+	LIFELESSES.push(new Sprite(100, 600, 450, 11, PIXEL_SCALE, "ground"))
+	LIFELESSES.push(new Sprite(300, 200, 450, 11, PIXEL_SCALE, "ground"))
 
-	BACKGROUNDS.push(new Sprite(0, 0, PIXEL_SCALE ,"background"))
+	BACKGROUNDS.push(new Sprite(0, 0, 450, 132, PIXEL_SCALE ,"background"))
 
 	window.lastTime = Date.now()
 	window.frameID = requestAnimationFrame(frame);
@@ -154,14 +151,13 @@ function render(){
 
 function frame(){
 	let now = Date.now()
-	//if(frameID%5 == 0){
 	let dt = Math.min(100,now - lastTime)/1000
 
 	update(dt*TIME_BOOSTER)
 	render()
 
 	ONCE_PRESSED_KEYS.clear()
-//}
+
 	lastTime = now
 	frameID=requestAnimationFrame(frame)
 }
