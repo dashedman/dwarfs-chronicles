@@ -179,7 +179,7 @@ function render(){
 	hero.draw(dx,dy)
 
   ctx.strokeText("map: "+map,20,60)
-  ctx.strokeText("wasd - move\nt - texture manage\nb - background manage\nn - lifleses manage\nm - alive manage\nv -  delete",20,50)
+  ctx.strokeText("wasd - move",20,50)
 	if(DEBUG){
     camera.draw(dx,dy)
 		ctx.strokeStyle = "blue"
