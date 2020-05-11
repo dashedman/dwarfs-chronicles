@@ -339,7 +339,13 @@ function update(dt){
 	}
 
 	if( ONCE_PRESSED_KEYS.has(KEY_R) ){
-		alert(mapToJson())
+		let jm = mapToJson()
+		alert("----------------------------\n"+jm+"\n----------------------------")
+	}
+
+	if( ONCE_PRESSED_KEYS.has(KEY_T) ){
+		let jm = mapToJson()
+		downloadText(jm)
 	}
 }
 
@@ -452,7 +458,7 @@ function render(){
   ctx.strokeText("wasd:move | c:grid | q&e:change texture",20,60)
 	ctx.strokeText("b:background mode | n:lifelesses mode | m:alive mode",20,70)
 	ctx.strokeText("space:set entity | x:delete entity | g:grab entity",20,80)
-	ctx.strokeText("r:save map to json",20,90)
+	ctx.strokeText("r:save map to buffer | t:save map to file",20,90)
 
 
 

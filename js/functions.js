@@ -26,9 +26,7 @@ function mapToJson(){
   function getClassType(x){
     if(x instanceof Sprite)return "sprite"
     if(x instanceof Alive)return "alive"
-
   }
-
 
   let jm = {"textures":{},"backgrounds":[],"lifelesses":[],"alives":[],hero:{}}
   for(let [name,texture] of TEXTURE_LIST){
@@ -36,7 +34,6 @@ function mapToJson(){
                           "frames":texture.frames,
                           "frameSpeed":texture.frameSpeed }
   }
-
 
   for(let entity of BACKGROUNDS){
     let class_type = getClassType(entity)
@@ -74,6 +71,13 @@ function mapToJson(){
     "race":hero.source
   }
   return JSON.stringify(jm)
+}
+
+function downloadText(text){
+  let element = document.createElement('a');
+  element.setAttribute('href', 'data:text/text;charset=utf-8,' + encodeURI(text));
+  element.setAttribute('download', "newmap.txt");
+  element.click();
 }
 
 function loadJsonResources(url){
