@@ -5,33 +5,38 @@ requestAnimationFrame = window.requestAnimationFrame ||
 	window.msRequestAnimationFrame ||
 	function(callback){ window.setTimeout(callback, 66) }
 
-var frameID = -1
-var lastTime = 0
-var hero = undefined
+frameID = undefined
+lastTime = 0
+hero = undefined
 
-var map = "forest"
-var mapStructure = undefined
+map = undefined
+mapStructure = undefined
 
+//editor
+camera = new Camera()
+USED_TEXTURE = new Map()
+texture_in_use = undefined
+texture_mode = undefined
+
+//canvas
 var canvas = document.getElementById("viewport")
 var ctx = canvas.getContext('2d')
-
 canvas.width = 960
 canvas.height = 540
-
-if(window.innerWidth*9 > window.innerHeight*16){
-	canvas.style.width = window.innerHeight * 16 / 9
-	canvas.style.height = window.innerHeight
-}else{
-	canvas.style.width = window.innerWidth
-	canvas.style.height = window.innerWidth * 9/16
-}
 
 
 
 ///////////////////////////////////////////////////////////
 //ACTIONS
 PRESSED_KEYS.fill(false)
-
+/*
+document.addEventListener('keydown', function(event) {
+	PRESSED_KEYS[event.keyCode] = true
+	ONCE_PRESSED_KEYS.add(event.keyCode)
+});
+document.addEventListener('keyup', function(event) {
+	PRESSED_KEYS[event.keyCode] = false
+});*/
 document.addEventListener('keydown', function(event) {
 	PRESSED_KEYS[event.keyCode] = true
 	ONCE_PRESSED_KEYS.add(event.keyCode)
@@ -48,41 +53,36 @@ window.addEventListener('blur', function() {
 	}
 });
 window.addEventListener('focus', function() {
-	if(frameID>=0){
+	if(frameID){
 		lastTime = Date.now()
-		frameID = requestAnimationFrame(frame)
 	}
+	frameID = requestAnimationFrame(frame)
 });
 
-window.addEventListener("resize", function() {
-	if(window.innerWidth*9 > window.innerHeight*16){
-		canvas.style.width = window.innerHeight * 16 / 9
-		canvas.style.height = window.innerHeight
-	}else{
-		canvas.style.width = window.innerWidth
-		canvas.style.height = window.innerWidth * 9/16
-	}
-
-})
 
 
 ////SCENE
 function mapPick(){
-	console.log("map: ", map, "path: "+MAP_PATH+map+".json")
-	loadJsonResources(MAP_PATH+map+".json")
-	.then((jsonMap)=>{
+  console.log("map pick")
+  getMapName()
+  .then((mapName)=>{
+    map = mapName
+    console.log("map: ", map, "path: "+MAP_PATH+map+".json")
+    loadJsonResources(MAP_PATH+map+".json")
+    .then((jsonMap)=>{
 
-		mapStructure = jsonMap
-		console.log("map is loaded\n",mapStructure)
-		loadData()
+      mapStructure = jsonMap
+      console.log("map is loaded\n",mapStructure)
+      loadData()
 
-	})
-	.catch(()=>{
+    })
+    .catch(()=>{
 
-		console.log("map not found")
-		alert("map not found :c")
+      console.log("map not found")
+      alert("map not found :c")
 
-	})
+    })
+  })
 }
 
 //LOAD DATA
@@ -109,13 +109,11 @@ function loadData(){
   Promise.all(promisses).then(initial).catch((e)=>{console.log(e)})
 }
 
-
-//GAME INIT START
+//EDITOR INIT START
 function initial(){
   console.log("initial objects")
 	ctx.fillStyle = "#000"
 	ctx.strokeStyle = "yellow"
-	ctx.width = 2
 	ctx.imageSmoothingEnabled = false
 
   let mapBackgrounds = mapStructure["backgrounds"]
@@ -158,29 +156,32 @@ function initial(){
 
 //MAIN FUNCTIONS
 function update(dt){
-  hero.update(dt)
+  //hero.update(dt)
+  camera.update(dt)
   for(let i=0;i<ALIVES.length;i++)ALIVES[i].update(dt)
   for(let i=0;i<LIFELESSES.length;i++)LIFELESSES[i].update(dt)
   for(let i=0;i<BACKGROUNDS.length;i++)BACKGROUNDS[i].update(dt)
 }
 
 function render(){
-	let dx = (canvas.width - hero.width)*0.5 - hero.x
-	let dy = (canvas.height - hero.height)*0.5 - hero.y
+	let dx = canvas.width*0.5 - camera.x
+	let dy = canvas.height*0.5 - camera.y
 
 	ctx.clearRect(0,0,canvas.width,canvas.height)
+
   //background
-	BACKGROUNDS[0].draw(dx,dy)
-  for(let i=1;i<BACKGROUNDS.length;i++)BACKGROUNDS[i].draw(dx,dy)
+  for(let i=0;i<BACKGROUNDS.length;i++)BACKGROUNDS[i].draw(dx,dy)
 
   //other entity
   for(let i=0;i<LIFELESSES.length;i++)LIFELESSES[i].draw(dx,dy)
   for(let i=0;i<ALIVES.length;i++)ALIVES[i].draw(dx,dy)
 
-	//hero
 	hero.draw(dx,dy)
 
+  ctx.strokeText("map: "+map,20,60)
+  ctx.strokeText("wasd - move\nt - texture manage\nb - background manage\nn - lifleses manage\nm - alive manage\nv -  delete",20,50)
 	if(DEBUG){
+    camera.draw(dx,dy)
 		ctx.strokeStyle = "blue"
 		ctx.strokeText(canvas.style.width+" "+canvas.style.height,20,20)
 		ctx.strokeText(canvas.width+" "+canvas.height,20,30)
@@ -190,7 +191,6 @@ function render(){
 }
 
 function frame(){
-
 	let now = Date.now()
 	let dt = Math.min(100,now - lastTime)/1000
 
@@ -204,6 +204,7 @@ function frame(){
 	}
 	if(frameID)frameID=requestAnimationFrame(frame)
 }
+
 
 //START
 mapPick()

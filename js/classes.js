@@ -16,7 +16,29 @@ class Texture{
 
 }
 
-
+class Camera{
+  constructor(x=0,y=0){
+    this.x = x
+    this.y = y
+  }
+  update(dt){
+  		if( PRESSED_KEYS[ KEY_A ] ) {
+        this.x += -1000*dt
+  		}
+  		if( PRESSED_KEYS[ KEY_D ] ) {
+        this.x += 1000*dt
+  		}
+      if( PRESSED_KEYS[ KEY_W ] ) {
+        this.y += -1000*dt
+      }
+      if( PRESSED_KEYS[ KEY_S ] ) {
+        this.y += 1000*dt
+  		}
+  }
+  draw(dx,dy){
+  		ctx.strokeText("x:"+this.x+" y:"+this.y,this.x+dx,this.y+dy)
+  }
+}
 
 
 class Entity{
@@ -133,7 +155,7 @@ class Entity{
 class Sprite extends Entity{
   constructor(x=0,y=0,w=1,h=1,s=1,source_path="",type=0){
     super(x,y,w,h,s,type)
-    this.texture = TEXTURE_LIST[source_path]
+    this.texture = TEXTURE_LIST.get(source_path)
     this.frameStatus = 0
   }
   draw(dx=0,dy=0){
@@ -177,9 +199,8 @@ class Sprite extends Entity{
   }
 }
 
-
 class Alive extends Entity{
-  constructor(x=0,y=0,w=1,h=1,s=0,source_path="",type = 0,seat_height = 1){
+  constructor(x=0,y=0,w=1,h=1,s=0,source_path="",type = 0){
     super(x,y,w,h,s,type)
     this.speedX = 0
     this.speedY = 0
@@ -187,59 +208,31 @@ class Alive extends Entity{
     this.jumpPower = 0.6
     this.onFloor = 0
     this.direction = 1
-    this.seatFlag = false
-
-    this.seat_height = seat_height * this.s
-    this.stay_height = this.height
 
     this.entityState = ANIMATION_STATE_STAY
     this.frameStatus = 0
 
-    this.animationList = new Array(ANIMATION_STATE_COUNTER)
-    this.animationList[ANIMATION_STATE_STAY] = TEXTURE_LIST[source_path+"_stay"]
-    this.animationList[ANIMATION_STATE_FALL] = TEXTURE_LIST[source_path+"_fall"]
-    this.animationList[ANIMATION_STATE_RUN] = TEXTURE_LIST[source_path+"_run"]
-    this.animationList[ANIMATION_STATE_JUMP_READY] = TEXTURE_LIST[source_path+"_jump_ready"]
-    this.animationList[ANIMATION_STATE_JUMP] = TEXTURE_LIST[source_path+"_jump"]
-    this.animationList[ANIMATION_STATE_JUMP_END] = TEXTURE_LIST[source_path+"_jump_end"]
-    this.animationList[ANIMATION_STATE_SITING] = TEXTURE_LIST[source_path+"_siting"]
-    this.animationList[ANIMATION_STATE_SEAT] = TEXTURE_LIST[source_path+"_seat"]
-    this.animationList[ANIMATION_STATE_CROUCH] = TEXTURE_LIST[source_path+"_crouch"]
-    this.animationList[ANIMATION_STATE_UPING] = TEXTURE_LIST[source_path+"_uping"]
+    this.animationList = new Array()
+    this.animationList[ANIMATION_STATE_STAY] = TEXTURE_LIST.get(source_path+"_stay")
+    this.animationList[ANIMATION_STATE_FALL] = TEXTURE_LIST.get(source_path+"_fall")
+    this.animationList[ANIMATION_STATE_RUN] = TEXTURE_LIST.get(source_path+"_run")
+    this.animationList[ANIMATION_STATE_JUMP_READY] = TEXTURE_LIST.get(source_path+"_jump_ready")
+    this.animationList[ANIMATION_STATE_JUMP] = TEXTURE_LIST.get(source_path+"_jump")
+    this.animationList[ANIMATION_STATE_JUMP_END] = TEXTURE_LIST.get(source_path+"_jump_end")
 
     this.curentAnimation = this.animationList[ANIMATION_STATE_STAY]
 
   }
 
-  inTonel(){
-    let tmpY = this.y + this.height - this.stay_height
-    for(let shape of LIFELESSES){
-      if( shape.x < this.x+this.width &&
-          shape.x+shape.width > this.x &&
-          shape.y+shape.height >= tmpY &&
-          shape.y+shape.height < this.y){
-
-        return true
-      }
-    }
-    return false
-  }
 
   stateUpdate = function(newState){
-    if(DEBUG)console.log(newState,this.onFloor,this.seatFlag)
+    if(DEBUG)console.log(newState)
 
-    if(newState == ANIMATION_STATE_SEAT){
-      this.y -= (this.seat_height - this.height)
-      this.height = this.seat_height
-    }else if(this.entityState == ANIMATION_STATE_SEAT && newState != ANIMATION_STATE_SEAT){
-      this.y -= (this.stay_height - this.height)
-      this.height = this.stay_height
-    }
-
-    this.frameStatus=0
+    this.frameStatus = 0
     this.entityState = newState
     this.curentAnimation = this.animationList[this.entityState]
   }
+
 
   draw(dx=0,dy=0){
       if(this.direction<0){
@@ -284,7 +277,56 @@ class Alive extends Entity{
 }
 
 
-class Hero extends Alive{
+class Humanity extends Alive{
+  constructor(x=0,y=0,w=1,h=1,s=1,source_path="",type=0, seat_height=1){
+    super(x,y,w,h,s,source_path,type)
+
+    this.seatFlag = false
+    this.seat_height = seat_height * this.s
+    this.stay_height = this.height
+
+    this.animationList[ANIMATION_STATE_SITING] = TEXTURE_LIST.get(source_path+"_siting")
+    this.animationList[ANIMATION_STATE_SEAT] = TEXTURE_LIST.get(source_path+"_seat")
+    this.animationList[ANIMATION_STATE_CROUCH] = TEXTURE_LIST.get(source_path+"_crouch")
+    this.animationList[ANIMATION_STATE_UPING] = TEXTURE_LIST.get(source_path+"_uping")
+
+  }
+
+
+  inTonel(){
+    let tmpY = this.y + this.height - this.stay_height
+    for(let shape of LIFELESSES){
+      if( shape.x < this.x+this.width &&
+          shape.x+shape.width > this.x &&
+          shape.y+shape.height >= tmpY &&
+          shape.y+shape.height < this.y){
+
+        return true
+      }
+    }
+    return false
+  }
+
+
+  stateUpdate = function(newState){
+    if(DEBUG)console.log(newState,this.onFloor,this.seatFlag)
+
+    if(newState == ANIMATION_STATE_SEAT){
+      this.y -= (this.seat_height - this.height)
+      this.height = this.seat_height
+    }else if(this.entityState == ANIMATION_STATE_SEAT && newState != ANIMATION_STATE_SEAT){
+      this.y -= (this.stay_height - this.height)
+      this.height = this.stay_height
+    }
+
+    this.frameStatus=0
+    this.entityState = newState
+    this.curentAnimation = this.animationList[this.entityState]
+  }
+}
+
+
+class Hero extends Humanity{
 	constructor(x=0,y=0,w=1,h=1,s=1,source_path="",type=0, seat_height=1){
     super(x,y,w,h,s,source_path,type, seat_height)
   }

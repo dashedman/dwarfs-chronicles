@@ -2,6 +2,7 @@
 //other
 const PIXEL_SCALE = 3
 const DATA_PATH = "resources/"
+const MAP_PATH = "maps/"
 const DEBUG = true
 
 //physics
@@ -22,7 +23,6 @@ const STATE_STAY
 //*/
 
 //animation states
-const ANIMATION_STATE_COUNTER = 11
 
 const ANIMATION_STATE_STAY = 0
 const ANIMATION_STATE_FALL = 1
@@ -45,6 +45,7 @@ const TYPE_TRIANGLE_LEFT_UP = 2
 const TYPE_TRIANGLE_RIGHT_UP = 3
 const TYPE_TRIANGLE_RIGHT_DOWN = 4
 const TYPE_TRIANGLE_LEFT_DOWN = 5
+
 
 //keycodes
 const KEY_SPACE = 32
