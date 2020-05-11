@@ -11,6 +11,11 @@
       "frames":1,
       "frameSpeed":10
     },
+"ground2":{
+      "name":"ground_forest_1_short.png",
+      "frames":1,
+      "frameSpeed":10
+    },
     "dwarf_stay":{
       "name":"dwarf_stay.png",
       "frames":8,
