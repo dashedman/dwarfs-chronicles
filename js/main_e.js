@@ -213,7 +213,7 @@ function initial(){
 
   }
 
-  let mapAlives = mapStructure["alive"]
+  let mapAlives = mapStructure["alives"]
   for(let obj of mapAlives){
     let obj = mapAlives[keyObj]
     if(obj.class_type == "alive"){
@@ -245,8 +245,8 @@ function update(dt){
   for(let i=0;i<BACKGROUNDS.length;i++)BACKGROUNDS[i].update(dt)
 
 	//EDITOR
-	//texture left
 
+	//texture left
 	if( ONCE_PRESSED_KEYS.has(KEY_Q) ){
 		let oldkey = undefined
 		for(let [key, texture] of TEXTURE_LIST){
@@ -258,6 +258,7 @@ function update(dt){
 			oldkey = key
 		}
 	}
+	//texture rigth
 	if( ONCE_PRESSED_KEYS.has(KEY_E) ){
 		let oldkey = null
 		for(let [key, texture] of TEXTURE_LIST){
@@ -269,6 +270,7 @@ function update(dt){
 			oldkey = key
 		}
 	}
+	//mod change
 	if( ONCE_PRESSED_KEYS.has(KEY_B) ){
 		setMode = "b"
 	}
@@ -278,6 +280,7 @@ function update(dt){
 	if( ONCE_PRESSED_KEYS.has(KEY_M) ){
 		setMode = "m"
 	}
+	//set entity
 	if( ONCE_PRESSED_KEYS.has(KEY_SPACE) ){
 		let tmpX = Math.min(mouseUpX,mouseDownX)
 		let tmpY = Math.min(mouseUpY,mouseDownY)
@@ -294,6 +297,7 @@ function update(dt){
 			ALIVE.push(new Sprite(tmpX,tmpY,tmpW,tmpH,PIXEL_SCALE,texture_in_use.key))
 		}
 	}
+	//delete entity
 	if( ONCE_PRESSED_KEYS.has(KEY_X) ){
 		let deleted = false
 		for(let i in ALIVES){
@@ -332,6 +336,10 @@ function update(dt){
 					}
 
 		}
+	}
+
+	if( ONCE_PRESSED_KEYS.has(KEY_R) ){
+		alert(mapToJson())
 	}
 }
 
@@ -444,6 +452,7 @@ function render(){
   ctx.strokeText("wasd:move | c:grid | q&e:change texture",20,60)
 	ctx.strokeText("b:background mode | n:lifelesses mode | m:alive mode",20,70)
 	ctx.strokeText("space:set entity | x:delete entity | g:grab entity",20,80)
+	ctx.strokeText("r:save map to json",20,90)
 
 
 

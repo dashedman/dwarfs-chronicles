@@ -153,10 +153,11 @@ class Entity{
 
 
 class Sprite extends Entity{
-  constructor(x=0,y=0,w=1,h=1,s=1,source_path="",type=0){
+  constructor(x=0,y=0,w=1,h=1,s=1,source="",type=0){
     super(x,y,w,h,s,type)
-    this.texture = TEXTURE_LIST.get(source_path)
+    this.texture = TEXTURE_LIST.get(source)
     this.frameStatus = 0
+    this.source = source
   }
   draw(dx=0,dy=0){
     ctx.drawImage(this.texture.data,
@@ -200,7 +201,7 @@ class Sprite extends Entity{
 }
 
 class Alive extends Entity{
-  constructor(x=0,y=0,w=1,h=1,s=0,source_path="",type = 0){
+  constructor(x=0,y=0,w=1,h=1,s=0,source="",type = 0){
     super(x,y,w,h,s,type)
     this.speedX = 0
     this.speedY = 0
@@ -211,14 +212,15 @@ class Alive extends Entity{
 
     this.entityState = ANIMATION_STATE_STAY
     this.frameStatus = 0
+    this.source = source
 
     this.animationList = new Array()
-    this.animationList[ANIMATION_STATE_STAY] = TEXTURE_LIST.get(source_path+"_stay")
-    this.animationList[ANIMATION_STATE_FALL] = TEXTURE_LIST.get(source_path+"_fall")
-    this.animationList[ANIMATION_STATE_RUN] = TEXTURE_LIST.get(source_path+"_run")
-    this.animationList[ANIMATION_STATE_JUMP_READY] = TEXTURE_LIST.get(source_path+"_jump_ready")
-    this.animationList[ANIMATION_STATE_JUMP] = TEXTURE_LIST.get(source_path+"_jump")
-    this.animationList[ANIMATION_STATE_JUMP_END] = TEXTURE_LIST.get(source_path+"_jump_end")
+    this.animationList[ANIMATION_STATE_STAY] = TEXTURE_LIST.get(source+"_stay")
+    this.animationList[ANIMATION_STATE_FALL] = TEXTURE_LIST.get(source+"_fall")
+    this.animationList[ANIMATION_STATE_RUN] = TEXTURE_LIST.get(source+"_run")
+    this.animationList[ANIMATION_STATE_JUMP_READY] = TEXTURE_LIST.get(source+"_jump_ready")
+    this.animationList[ANIMATION_STATE_JUMP] = TEXTURE_LIST.get(source+"_jump")
+    this.animationList[ANIMATION_STATE_JUMP_END] = TEXTURE_LIST.get(source+"_jump_end")
 
     this.curentAnimation = this.animationList[ANIMATION_STATE_STAY]
 
@@ -278,17 +280,17 @@ class Alive extends Entity{
 
 
 class Humanity extends Alive{
-  constructor(x=0,y=0,w=1,h=1,s=1,source_path="",type=0, seat_height=1){
-    super(x,y,w,h,s,source_path,type)
+  constructor(x=0,y=0,w=1,h=1,s=1,source="",type=0, seat_height=1){
+    super(x,y,w,h,s,source,type)
 
     this.seatFlag = false
     this.seat_height = seat_height * this.s
     this.stay_height = this.height
 
-    this.animationList[ANIMATION_STATE_SITING] = TEXTURE_LIST.get(source_path+"_siting")
-    this.animationList[ANIMATION_STATE_SEAT] = TEXTURE_LIST.get(source_path+"_seat")
-    this.animationList[ANIMATION_STATE_CROUCH] = TEXTURE_LIST.get(source_path+"_crouch")
-    this.animationList[ANIMATION_STATE_UPING] = TEXTURE_LIST.get(source_path+"_uping")
+    this.animationList[ANIMATION_STATE_SITING] = TEXTURE_LIST.get(source+"_siting")
+    this.animationList[ANIMATION_STATE_SEAT] = TEXTURE_LIST.get(source+"_seat")
+    this.animationList[ANIMATION_STATE_CROUCH] = TEXTURE_LIST.get(source+"_crouch")
+    this.animationList[ANIMATION_STATE_UPING] = TEXTURE_LIST.get(source+"_uping")
 
   }
 
@@ -327,8 +329,8 @@ class Humanity extends Alive{
 
 
 class Hero extends Humanity{
-	constructor(x=0,y=0,w=1,h=1,s=1,source_path="",type=0, seat_height=1){
-    super(x,y,w,h,s,source_path,type, seat_height)
+	constructor(x=0,y=0,w=1,h=1,s=1,source="",type=0, seat_height=1){
+    super(x,y,w,h,s,source,type, seat_height)
   }
 
 

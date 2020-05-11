@@ -110,7 +110,7 @@
     }
   ],
 
-  "alive":[],
+  "alives":[],
   "hero":{
     "race":"dwarf",
     "x":100,
