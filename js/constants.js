@@ -4,6 +4,7 @@ const PIXEL_SCALE = 3
 const DATA_PATH = "resources/"
 const MAP_PATH = "maps/"
 const DEBUG = true
+const PI = Math.PI
 
 //physics
 const GRAVITY = 1000

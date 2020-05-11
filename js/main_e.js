@@ -5,18 +5,12 @@ requestAnimationFrame = window.requestAnimationFrame ||
 	window.msRequestAnimationFrame ||
 	function(callback){ window.setTimeout(callback, 66) }
 
-frameID = undefined
-lastTime = 0
-hero = undefined
+var frameID = undefined
+var lastTime = 0
+var hero = undefined
 
-map = undefined
-mapStructure = undefined
-
-//editor
-camera = new Camera()
-USED_TEXTURE = new Map()
-texture_in_use = undefined
-texture_mode = undefined
+var map = undefined
+var mapStructure = undefined
 
 //canvas
 var canvas = document.getElementById("viewport")
@@ -24,6 +18,32 @@ var ctx = canvas.getContext('2d')
 canvas.width = 960
 canvas.height = 540
 
+
+///////////////////////////////////////////////////////////
+//editor
+var camera = new Camera()
+var setMode = "b"
+var texture_in_use = undefined
+var mouseDownX=0,mouseDownY=0,mouseUpX=0,mouseUpY=0,mouseX=0,mouseY=0,mouseIsDown=false
+var ceilSize = 10
+function getCeilMouse(x){
+	return Math.round(x/ceilSize)*ceilSize
+}
+
+document.addEventListener("mousedown",(event)=>{
+	mouseIsDown = true
+	mouseDownX = getCeilMouse(event.clientX + camera.x - canvas.width*0.5 - canvas.offsetLeft)
+	mouseDownY = getCeilMouse(event.clientY + camera.y - canvas.height*0.5 - canvas.offsetTop)
+})
+document.addEventListener("mousemove",(event)=>{
+	mouseX = getCeilMouse(event.clientX + camera.x - canvas.width*0.5 - canvas.offsetLeft)
+	mouseY = getCeilMouse(event.clientY + camera.y - canvas.height*0.5 - canvas.offsetTop)
+})
+document.addEventListener("mouseup",(event)=>{
+	mouseIsDown = false
+	mouseUpX=getCeilMouse(event.clientX + camera.x - canvas.width*0.5 - canvas.offsetLeft)
+	mouseUpY=getCeilMouse(event.clientY + camera.y - canvas.height*0.5 - canvas.offsetTop)
+})
 
 
 ///////////////////////////////////////////////////////////
@@ -53,10 +73,10 @@ window.addEventListener('blur', function() {
 	}
 });
 window.addEventListener('focus', function() {
-	if(frameID){
+	if(frameID>=0){
 		lastTime = Date.now()
+		frameID = requestAnimationFrame(frame)
 	}
-	frameID = requestAnimationFrame(frame)
 });
 
 
@@ -116,6 +136,12 @@ function initial(){
 	ctx.strokeStyle = "yellow"
 	ctx.imageSmoothingEnabled = false
 
+	for(let [key,texture] of TEXTURE_LIST){
+		texture_in_use = {key:key,texture:texture}
+		break
+	}
+
+
   let mapBackgrounds = mapStructure["backgrounds"]
   for(let obj of mapBackgrounds){
     if(obj.class_type == "sprite"){
@@ -161,6 +187,54 @@ function update(dt){
   for(let i=0;i<ALIVES.length;i++)ALIVES[i].update(dt)
   for(let i=0;i<LIFELESSES.length;i++)LIFELESSES[i].update(dt)
   for(let i=0;i<BACKGROUNDS.length;i++)BACKGROUNDS[i].update(dt)
+
+	//EDITOR
+	//texture left
+
+	if( ONCE_PRESSED_KEYS.has(KEY_Q) ){
+		let oldkey = undefined
+		for(let [key, texture] of TEXTURE_LIST){
+			if(key == texture_in_use.key){
+				if( oldkey )texture_in_use = {key:oldkey,texture:TEXTURE_LIST.get(oldkey)}
+				break
+			}
+
+			oldkey = key
+		}
+	}
+	if( ONCE_PRESSED_KEYS.has(KEY_E) ){
+		let oldkey = null
+		for(let [key, texture] of TEXTURE_LIST){
+			if(oldkey == texture_in_use.key){
+				texture_in_use = {key:key,texture:texture}
+				break
+			}
+
+			oldkey = key
+		}
+	}
+	if( ONCE_PRESSED_KEYS.has(KEY_B) ){
+		setMode = "b"
+	}
+	if( ONCE_PRESSED_KEYS.has(KEY_N) ){
+		setMode = "n"
+	}
+	if( ONCE_PRESSED_KEYS.has(KEY_M) ){
+		setMode = "m"
+	}
+	if( ONCE_PRESSED_KEYS.has(KEY_SPACE) ){
+		let tmpX = Math.min(mouseX,mouseDownX)
+		let tmpY = Math.min(mouseY,mouseDownY)
+		let tmpW = Math.max(mouseX,mouseDownX)-tmpX
+		let tmpH = Math.max(mouseY,mouseDownY)-tmpY
+
+		if(setMode == "b"){
+			BACKGROUNDS.push(new Sprite(tmpX,tmpY,tmpW,tmpH,PIXEL_SCALE,texture_in_use.key))
+		}
+		if(setMode == "n"){
+			LIFELESSES.push(new Sprite(tmpX,tmpY,tmpW,tmpH,PIXEL_SCALE,texture_in_use.key))
+		}
+	}
 }
 
 function render(){
@@ -178,8 +252,79 @@ function render(){
 
 	hero.draw(dx,dy)
 
-  ctx.strokeText("map: "+map,20,60)
-  ctx.strokeText("wasd - move",20,50)
+	//EDITOR
+
+	//used texture
+	ctx.drawImage(texture_in_use.texture.data,
+								0,
+								0,
+								texture_in_use.texture.data.naturalWidth,
+								texture_in_use.texture.data.naturalHeight,
+								canvas.width - Math.min(100,texture_in_use.texture.data.naturalWidth),
+								0,
+								Math.min(100,texture_in_use.texture.data.naturalWidth),
+								Math.min(100,texture_in_use.texture.data.naturalHeight))
+	ctx.strokeText(texture_in_use.key,canvas.width - 100, 110)
+	//mouse rect
+	ctx.strokeStyle = "cyan"
+	if(mouseIsDown){
+		let tmpX = Math.min(mouseX,mouseDownX)
+		let tmpY = Math.min(mouseY,mouseDownY)
+		let tmpW = Math.max(mouseX,mouseDownX)-tmpX
+		let tmpH = Math.max(mouseY,mouseDownY)-tmpY
+		ctx.drawImage(texture_in_use.texture.data,
+                  0,
+                  0,
+                  texture_in_use.texture.frameWidth,
+                  texture_in_use.texture.frameHeight,
+                  tmpX + tmpW*0.5 - texture_in_use.texture.frameWidth * PIXEL_SCALE * 0.5 +dx,
+									tmpY + tmpH*0.5 - texture_in_use.texture.frameHeight * PIXEL_SCALE * 0.5 +dy,
+                  texture_in_use.texture.frameWidth * PIXEL_SCALE,
+                  texture_in_use.texture.frameHeight * PIXEL_SCALE)
+
+		ctx.strokeRect(tmpX+dx,tmpY+dy,tmpW,tmpH)
+	}
+	else {
+		let tmpX = Math.min(mouseUpX,mouseDownX)
+		let tmpY = Math.min(mouseUpY,mouseDownY)
+		let tmpW = Math.max(mouseUpX,mouseDownX)-tmpX
+		let tmpH = Math.max(mouseUpY,mouseDownY)-tmpY
+		ctx.strokeRect(tmpX+dx,tmpY+dy,tmpW,tmpH)
+		ctx.strokeRect(mouseX+dx,mouseY+dy,1,1)
+	}
+
+
+		//grid
+		if( PRESSED_KEYS[ KEY_C ]){
+			ctx.strokeStyle = "gray"
+			let tmpX = getCeilMouse(camera.x - canvas.width*0.5)
+			let tmpY = getCeilMouse(camera.y - canvas.height*0.5)
+			let tmpW = Math.floor(canvas.width / ceilSize)
+			let tmpH = Math.floor(canvas.height / ceilSize)
+			ctx.beginPath()
+			for(let i = 0;i<=tmpW;i++){
+				ctx.moveTo(tmpX+i*ceilSize+dx,tmpY+dy)
+				ctx.lineTo(tmpX+i*ceilSize+dx,tmpY+tmpH*ceilSize+dy)
+			}
+			for(let i = 0;i<=tmpW;i++){
+				ctx.moveTo(tmpX+dx,tmpY+i*ceilSize+dy)
+				ctx.lineTo(tmpX+tmpW*ceilSize+dx,tmpY+i*ceilSize+dy)
+			}
+			ctx.stroke()
+			ctx.closePath()
+		}
+
+	//legend
+	ctx.strokeStyle = "red"
+	ctx.strokeText("mod: "+ setMode,canvas.width*0.5,canvas.height*0.5 + 10)
+	ctx.strokeStyle = "yellow"
+  ctx.strokeText("map: "+map,20,50)
+  ctx.strokeText("wasd:move | c:grid | q&e:change texture",20,60)
+	ctx.strokeText("b:background mode | n:lifelesses mode | m:alive mode",20,70)
+	ctx.strokeText("space:set entity | x:delete entity",20,80)
+
+
+
 	if(DEBUG){
     camera.draw(dx,dy)
 		ctx.strokeStyle = "blue"
@@ -197,6 +342,7 @@ function frame(){
 	if(dt>0.0001){
 		update(dt*TIME_BOOSTER)
 		render()
+
 
 		ONCE_PRESSED_KEYS.clear()
 
