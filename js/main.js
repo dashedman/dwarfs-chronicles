@@ -113,9 +113,9 @@ function loadData(){
 //GAME INIT START
 function initial(){
   console.log("initial objects")
-	ctx.fillStyle = "#000"
+	ctx.fillStyle = "yellow"
+	ctx.font = "12px caption";
 	ctx.strokeStyle = "yellow"
-	ctx.width = 2
 	ctx.imageSmoothingEnabled = false
 
   let mapBackgrounds = mapStructure["backgrounds"]
@@ -133,7 +133,7 @@ function initial(){
 
   }
 
-  let mapAlives = mapStructure["alive"]
+  let mapAlives = mapStructure["alives"]
   for(let obj of mapAlives){
     let obj = mapAlives[keyObj]
     if(obj.class_type == "alive"){

@@ -74,10 +74,11 @@ function mapToJson(){
 }
 
 function downloadText(text){
-  let element = document.createElement('a');
-  element.setAttribute('href', 'data:text/text;charset=utf-8,' + encodeURI(text));
-  element.setAttribute('download', "newmap.txt");
-  element.click();
+  let element = document.createElement('a')
+  element.setAttribute('href', 'data:text/text;charset=utf-8,' + encodeURI(text))
+  element.setAttribute('download', "newmap.txt")
+  element.click()
+  element.remove()
 }
 
 function loadJsonResources(url){

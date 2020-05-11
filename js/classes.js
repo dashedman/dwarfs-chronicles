@@ -36,7 +36,7 @@ class Camera{
   		}
   }
   draw(dx,dy){
-  		ctx.strokeText("x:"+this.x+" y:"+this.y,this.x+dx,this.y+dy)
+  		ctx.fillText("x:"+this.x+" y:"+this.y,this.x+dx,this.y+dy)
   }
 }
 
@@ -174,7 +174,7 @@ class Sprite extends Entity{
                       this.y + this.height*0.5 - this.texture.frameHeight * this.s * 0.5 +dy,
                       this.texture.frameWidth*this.s,
                       this.texture.frameHeight*this.s)
-      ctx.strokeText("tw:"+this.texture.frameWidth + " th:"+this.texture.frameHeight,this.x+dx,this.y+dy+30)
+      ctx.fillText("tw:"+this.texture.frameWidth + " th:"+this.texture.frameHeight,this.x+dx,this.y+dy+30)
       if(this.collideFlag){
         ctx.strokeStyle = "green"
         ctx.strokeRect( this.x+1+dx,
@@ -189,8 +189,8 @@ class Sprite extends Entity{
                         this.height)
 
       }
-      ctx.strokeText("x:"+this.x + " y:"+this.y,this.x+dx,this.y+dy+10)
-      ctx.strokeText("w:"+this.width + " h:"+this.height,this.x+dx,this.y+dy+20)
+      ctx.fillText("x:"+this.x + " y:"+this.y,this.x+dx,this.y+dy+10)
+      ctx.fillText("w:"+this.width + " h:"+this.height,this.x+dx,this.y+dy+20)
       ctx.strokeStyle = "yellow"
 
     }
@@ -267,9 +267,9 @@ class Alive extends Entity{
                         this.width,
                         this.height)
         ctx.strokeStyle = "yellow"
-    		ctx.strokeText("x:"+this.x+" y:"+this.y,this.x+dx,this.y+dy-25)
-    		ctx.strokeText("dx:"+this.speedX+" dy:"+this.speedY,this.x+dx,this.y+dy-15)
-        ctx.strokeText("state:"+this.entityState+" frame:"+this.frameStatus,this.x+dx,this.y+dy-5)
+    		ctx.fillText("x:"+this.x+" y:"+this.y,this.x+dx,this.y+dy-25)
+    		ctx.fillText("dx:"+this.speedX+" dy:"+this.speedY,this.x+dx,this.y+dy-15)
+        ctx.fillText("state:"+this.entityState+" frame:"+this.frameStatus,this.x+dx,this.y+dy-5)
       }
     }
 

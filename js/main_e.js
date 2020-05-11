@@ -188,7 +188,8 @@ function loadData(){
 //EDITOR INIT START
 function initial(){
   console.log("initial objects")
-	ctx.fillStyle = "#000"
+	ctx.fillStyle = "yellow"
+	ctx.font = "12px caption";
 	ctx.strokeStyle = "yellow"
 	ctx.imageSmoothingEnabled = false
 
@@ -376,7 +377,7 @@ function render(){
 								0,
 								Math.min(100,texture_in_use.texture.data.naturalWidth),
 								Math.min(100,texture_in_use.texture.data.naturalHeight))
-	ctx.strokeText(texture_in_use.key,canvas.width - 100, 110)
+	ctx.fillText(texture_in_use.key,canvas.width - 100, 110)
 
 	//mouse rect
 	if( grabed > -1){
@@ -448,27 +449,29 @@ function render(){
 		}
 		ctx.stroke()
 		ctx.closePath()
+		ctx.strokeStyle = "yellow"
 	}
 
 	//legend
-	ctx.strokeStyle = "red"
-	ctx.strokeText("mod: "+ setMode,canvas.width*0.5,canvas.height*0.5 + 10)
-	ctx.strokeStyle = "yellow"
-  ctx.strokeText("map: "+map,20,50)
-  ctx.strokeText("wasd:move | c:grid | q&e:change texture",20,60)
-	ctx.strokeText("b:background mode | n:lifelesses mode | m:alive mode",20,70)
-	ctx.strokeText("space:set entity | x:delete entity | g:grab entity",20,80)
-	ctx.strokeText("r:save map to buffer | t:save map to file",20,90)
+	ctx.fillStyle = "red"
+	ctx.fillText("mod: "+ setMode,canvas.width*0.5,canvas.height*0.5 + 10)
+	ctx.fillStyle = "yellow"
+  ctx.fillText("map: "+map,20,50)
+  ctx.fillText("wasd:move | c:grid | q&e:change texture",20,60)
+	ctx.fillText("b:background mode | n:lifelesses mode | m:alive mode",20,70)
+	ctx.fillText("space:set entity | x:delete entity | g:grab entity",20,80)
+	ctx.fillText("r:save map to buffer | t:save map to file",20,90)
 
 
 
 	if(DEBUG){
     camera.draw(dx,dy)
-		ctx.strokeStyle = "blue"
-		ctx.strokeText(canvas.style.width+" "+canvas.style.height,20,20)
-		ctx.strokeText(canvas.width+" "+canvas.height,20,30)
-		ctx.strokeText(frameID,20,40)
-		ctx.strokeStyle = "yellow"
+		ctx.fillStyle = "blue"
+		ctx.fillText(canvas.style.width+" "+canvas.style.height,20,20)
+		ctx.fillText(canvas.width+" "+canvas.height,20,30)
+		ctx.fillText(frameID,20,40)
+		ctx.fillStyle = "yellow"
+
 	}
 }
 
