@@ -223,16 +223,58 @@ function update(dt){
 		setMode = "m"
 	}
 	if( ONCE_PRESSED_KEYS.has(KEY_SPACE) ){
-		let tmpX = Math.min(mouseX,mouseDownX)
-		let tmpY = Math.min(mouseY,mouseDownY)
-		let tmpW = Math.max(mouseX,mouseDownX)-tmpX
-		let tmpH = Math.max(mouseY,mouseDownY)-tmpY
+		let tmpX = Math.min(mouseUpX,mouseDownX)
+		let tmpY = Math.min(mouseUpY,mouseDownY)
+		let tmpW = (Math.max(mouseUpX,mouseDownX)-tmpX)/PIXEL_SCALE
+		let tmpH = (Math.max(mouseUpY,mouseDownY)-tmpY)/PIXEL_SCALE
 
 		if(setMode == "b"){
 			BACKGROUNDS.push(new Sprite(tmpX,tmpY,tmpW,tmpH,PIXEL_SCALE,texture_in_use.key))
 		}
 		if(setMode == "n"){
 			LIFELESSES.push(new Sprite(tmpX,tmpY,tmpW,tmpH,PIXEL_SCALE,texture_in_use.key))
+		}
+		if(setMode == "m"){
+			ALIVE.push(new Sprite(tmpX,tmpY,tmpW,tmpH,PIXEL_SCALE,texture_in_use.key))
+		}
+	}
+	if( ONCE_PRESSED_KEYS.has(KEY_X) ){
+		let deleted = false
+		for(let i in ALIVES){
+			let entity = ALIVES[i]
+			if(deleted)break
+			if(	entity.x<mouseX &&
+					entity.x+entity.width > mouseX &&
+					entity.y<mouseY &&
+					entity.y+entity.height > mouseY ){
+						deleted = true
+						ALIVE.splice(i,1)
+					}
+
+		}
+		for(let i in LIFELESSES){
+			let entity = LIFELESSES[i]
+			if(deleted)break
+			if(	entity.x<mouseX &&
+					entity.x+entity.width > mouseX &&
+					entity.y<mouseY &&
+					entity.y+entity.height > mouseY ){
+						deleted = true
+						LIFELESSES.splice(i,1)
+					}
+
+		}
+		for(let i in BACKGROUNDS){
+			let entity = BACKGROUNDS[i]
+			if(deleted)break
+			if(	entity.x<mouseX &&
+					entity.x+entity.width > mouseX &&
+					entity.y<mouseY &&
+					entity.y+entity.height > mouseY ){
+						deleted = true
+						BACKGROUNDS.splice(i,1)
+					}
+
 		}
 	}
 }
