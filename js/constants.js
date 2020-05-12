@@ -49,11 +49,24 @@ const TYPE_TRIANGLE_LEFT_DOWN = 5
 
 
 //keycodes
+const KEY_ESCAPE = 27
+const KEY_BACKSPACE = 8
+const KEY_TAB = 9
 const KEY_SPACE = 32
+const KEY_ENTER = 13
+const KEY_SHIFT = 16
+const KEY_CTRL = 17
+const KEY_ALT = 18
+
 const KEY_LEFT = 37
 const KEY_UP = 38
 const KEY_RIGHT = 39
 const KEY_DOWN = 40
+
+const KEY_PLUS = 187
+const KEY_EQUAL = 187
+const KEY_MINUS = 189
+
 const KEY_A = 65
 const KEY_B = 66
 const KEY_C = 67
@@ -80,3 +93,14 @@ const KEY_W = 87
 const KEY_X = 88
 const KEY_Y = 89
 const KEY_Z = 90
+
+const KEY_ZERO = 48
+const KEY_ONE = 49
+const KEY_TWO = 50
+const KEY_THREE = 51
+const KEY_FOUR = 52
+const KEY_FIVE = 53
+const KEY_SIX = 54
+const KEY_SEVEN = 55
+const KEY_EIGHT = 56
+const KEY_NINE = 57

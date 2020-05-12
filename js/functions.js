@@ -6,6 +6,10 @@ function cross(x1,y1,x2,y2){
   return x1*y2 - x2*y1
 }
 
+function ceil(x,y){
+	return Math.round(x/y)*y
+}
+
 function getMapName(){
   return new Promise(function(resolve,reject){
     const popup = document.querySelector("#popup");
@@ -41,6 +45,7 @@ function mapToJson(){
                             "y":entity.y,
                             "width":entity.width/entity.s,
                             "height":entity.height/entity.s,
+                            "scale":entity.s,
                             "texture_name":entity.source,
                             "class_type":class_type} )
   }
@@ -50,6 +55,7 @@ function mapToJson(){
                           "y":entity.y,
                           "width":entity.width/entity.s,
                           "height":entity.height/entity.s,
+                          "scale":entity.s,
                           "texture_name":entity.source,
                           "class_type":class_type} )
   }
@@ -59,6 +65,7 @@ function mapToJson(){
                       "y":entity.y,
                       "width":entity.width/entity.s,
                       "height":entity.height/entity.s,
+                      "scale":entity.s,
                       "texture_name":entity.source,
                       "class_type":class_type} )
   }
@@ -67,16 +74,17 @@ function mapToJson(){
     "y":hero.y,
     "width":hero.width/hero.s,
     "height":hero.height/hero.s,
+    "scale":entity.s,
     "seat_height":hero.seat_height,
     "race":hero.source
   }
   return JSON.stringify(jm)
 }
 
-function downloadText(text){
+function downloadJson(text){
   let element = document.createElement('a')
   element.setAttribute('href', 'data:text/text;charset=utf-8,' + encodeURI(text))
-  element.setAttribute('download', "newmap.txt")
+  element.setAttribute('download', "newmap.json")
   element.click()
   element.remove()
 }

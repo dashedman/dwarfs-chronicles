@@ -17,7 +17,7 @@ var ctx = canvas.getContext('2d')
 
 canvas.width = 960
 canvas.height = 540
-
+/*
 if(window.innerWidth*9 > window.innerHeight*16){
 	canvas.style.width = window.innerHeight * 16 / 9
 	canvas.style.height = window.innerHeight
@@ -25,7 +25,7 @@ if(window.innerWidth*9 > window.innerHeight*16){
 	canvas.style.width = window.innerWidth
 	canvas.style.height = window.innerWidth * 9/16
 }
-
+*/
 
 
 ///////////////////////////////////////////////////////////
@@ -55,6 +55,7 @@ window.addEventListener('focus', function() {
 });
 
 window.addEventListener("resize", function() {
+	/*
 	if(window.innerWidth*9 > window.innerHeight*16){
 		canvas.style.width = window.innerHeight * 16 / 9
 		canvas.style.height = window.innerHeight
@@ -62,14 +63,14 @@ window.addEventListener("resize", function() {
 		canvas.style.width = window.innerWidth
 		canvas.style.height = window.innerWidth * 9/16
 	}
-
+*/
 })
 
 
 ////SCENE
 function mapPick(){
 	console.log("map: ", map, "path: "+MAP_PATH+map+".json")
-	loadJsonResources(MAP_PATH+map+".json")
+	loadJsonResources(MAP_PATH + map + ".json")
 	.then((jsonMap)=>{
 
 		mapStructure = jsonMap
@@ -121,14 +122,14 @@ function initial(){
   let mapBackgrounds = mapStructure["backgrounds"]
   for(let obj of mapBackgrounds){
     if(obj.class_type == "sprite"){
-      BACKGROUNDS.push(new Sprite(obj.x, obj.y, obj.width, obj.height, PIXEL_SCALE, obj.texture_name))
+      BACKGROUNDS.push(new Sprite(obj.x, obj.y, obj.width, obj.height, obj.scale, obj.texture_name))
     }
   }
 
   let mapLifeless = mapStructure["lifelesses"]
   for(let obj of mapLifeless){
     if(obj.class_type == "sprite"){
-      LIFELESSES.push(new Sprite(obj.x, obj.y, obj.width, obj.height, PIXEL_SCALE, obj.texture_name))
+      LIFELESSES.push(new Sprite(obj.x, obj.y, obj.width, obj.height, obj.scale, obj.texture_name))
     }
 
   }
@@ -137,18 +138,12 @@ function initial(){
   for(let obj of mapAlives){
     let obj = mapAlives[keyObj]
     if(obj.class_type == "alive"){
-      ALIVES.push(new Alive(obj.x, obj.y, obj.width, obj.height, PIXEL_SCALE, obj.texture_name))
+      ALIVES.push(new Alive(obj.x, obj.y, obj.width, obj.height, obj.scale, obj.texture_name))
     }
   }
 
 	let heroData =  mapStructure["hero"]
-	hero = new Hero(heroData.x, heroData.y, heroData.width, heroData.height, PIXEL_SCALE,  heroData.race, 0, heroData.seat_height)
-
-	console.log(TEXTURE_LIST)
-	console.log(BACKGROUNDS)
-	console.log(LIFELESSES)
-	console.log(ALIVES)
-	console.log(hero)
+	hero = new Hero(heroData.x, heroData.y, heroData.width, heroData.height, heroData.scale,  heroData.race, 0, heroData.seat_height)
 
   console.log("start")
 	lastTime = Date.now()
@@ -170,8 +165,7 @@ function render(){
 
 	ctx.clearRect(0,0,canvas.width,canvas.height)
   //background
-	BACKGROUNDS[0].draw(dx,dy)
-  for(let i=1;i<BACKGROUNDS.length;i++)BACKGROUNDS[i].draw(dx,dy)
+  for(let i=0;i<BACKGROUNDS.length;i++)BACKGROUNDS[i].draw(dx,dy)
 
   //other entity
   for(let i=0;i<LIFELESSES.length;i++)LIFELESSES[i].draw(dx,dy)
@@ -204,6 +198,3 @@ function frame(){
 	}
 	if(frameID)frameID=requestAnimationFrame(frame)
 }
-
-//START
-mapPick()

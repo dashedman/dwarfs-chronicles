@@ -13,7 +13,6 @@ class Texture{
 		},{once:true})
     this.data.src = path
   }
-
 }
 
 class Camera{
@@ -42,7 +41,7 @@ class Camera{
 
 
 class Entity{
-  constructor(x=0,y=0,w=1,h=1,s=1,type=0){
+  constructor(x=0,y=0,w=1,h=1,s=PIXEL_SCALE,type=0){
     this.x = x
     this.y = y
     this.s = s
@@ -153,7 +152,7 @@ class Entity{
 
 
 class Sprite extends Entity{
-  constructor(x=0,y=0,w=1,h=1,s=1,source="",type=0){
+  constructor(x=0,y=0,w=1,h=1,s=PIXEL_SCALE,source="",type=0){
     super(x,y,w,h,s,type)
     this.texture = TEXTURE_LIST.get(source)
     this.frameStatus = 0
@@ -201,7 +200,7 @@ class Sprite extends Entity{
 }
 
 class Alive extends Entity{
-  constructor(x=0,y=0,w=1,h=1,s=0,source="",type = 0){
+  constructor(x=0,y=0,w=1,h=1,s=PIXEL_SCALE,source="",type = 0){
     super(x,y,w,h,s,type)
     this.speedX = 0
     this.speedY = 0
@@ -280,7 +279,7 @@ class Alive extends Entity{
 
 
 class Humanity extends Alive{
-  constructor(x=0,y=0,w=1,h=1,s=1,source="",type=0, seat_height=1){
+  constructor(x=0,y=0,w=1,h=1,s=PIXEL_SCALE,source="",type=0, seat_height=1){
     super(x,y,w,h,s,source,type)
 
     this.seatFlag = false
@@ -329,7 +328,7 @@ class Humanity extends Alive{
 
 
 class Hero extends Humanity{
-	constructor(x=0,y=0,w=1,h=1,s=1,source="",type=0, seat_height=1){
+	constructor(x=0,y=0,w=1,h=1,s=PIXEL_SCALE,source="",type=0, seat_height=1){
     super(x,y,w,h,s,source,type, seat_height)
   }
 
