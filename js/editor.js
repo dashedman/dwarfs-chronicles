@@ -301,10 +301,10 @@ function update(dt){
 		for(let i in ALIVES){
 			let entity = ALIVES[i]
 			if(deleted)break
-			if(	entity.x<mouseX &&
-					entity.x+entity.width > mouseX &&
-					entity.y<mouseY &&
-					entity.y+entity.height > mouseY ){
+			if(	entity.x<=mouseX &&
+					entity.x+entity.width >= mouseX &&
+					entity.y<=mouseY &&
+					entity.y+entity.height >= mouseY ){
 						deleted = true
 						ALIVE.splice(i,1)
 					}
@@ -313,10 +313,10 @@ function update(dt){
 		for(let i in LIFELESSES){
 			let entity = LIFELESSES[i]
 			if(deleted)break
-			if(	entity.x<mouseX &&
-					entity.x+entity.width > mouseX &&
-					entity.y<mouseY &&
-					entity.y+entity.height > mouseY ){
+			if(	entity.x<=mouseX &&
+					entity.x+entity.width >= mouseX &&
+					entity.y<=mouseY &&
+					entity.y+entity.height >= mouseY ){
 						deleted = true
 						LIFELESSES.splice(i,1)
 					}
@@ -325,10 +325,10 @@ function update(dt){
 		for(let i in BACKGROUNDS){
 			let entity = BACKGROUNDS[i]
 			if(deleted)break
-			if(	entity.x<mouseX &&
-					entity.x+entity.width > mouseX &&
-					entity.y<mouseY &&
-					entity.y+entity.height > mouseY ){
+			if(	entity.x<=mouseX &&
+					entity.x+entity.width >= mouseX &&
+					entity.y<=mouseY &&
+					entity.y+entity.height >= mouseY ){
 						deleted = true
 						BACKGROUNDS.splice(i,1)
 					}
