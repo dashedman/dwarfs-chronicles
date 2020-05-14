@@ -6,7 +6,12 @@ requestAnimationFrame = window.requestAnimationFrame ||
 	function(callback){ window.setTimeout(callback, 66) }
 
 var frameID = -1
+
+var fpsCounter = 0
+var fps = 0
+var onesecond = 0
 var lastTime = 0
+
 var hero = undefined
 
 var map = "parallaxback"
@@ -50,7 +55,7 @@ window.addEventListener('blur', function() {
 });
 window.addEventListener('focus', function() {
 	if(frameID>=0){
-		lastTime = Date.now()
+		lastTime = performance.now()
 		frameID = requestAnimationFrame(frame)
 	}
 });
@@ -157,7 +162,7 @@ function initial(){
 ////
 function startLoop(){
 	console.log("start")
-	lastTime = Date.now()
+	lastTime = performance.now()
 	frameID = requestAnimationFrame(frame);
 }
 //MAIN FUNCTIONS
@@ -202,19 +207,27 @@ function render(){
 		ctx.strokeStyle = "blue"
 		ctx.strokeText(canvas.style.width+" "+canvas.style.height,20,20)
 		ctx.strokeText(canvas.width+" "+canvas.height,20,30)
-		ctx.strokeText(frameID,20,40)
+		ctx.strokeText(fps,20,40)
 		ctx.strokeStyle = "yellow"
 	}
 }
 
 function frame(){
 
-	let now = Date.now()
+	let now = performance.now()
 	let dt = Math.min(100,now - lastTime)/1000
+	onesecond += dt
+	if(onesecond>1){
+		onesecond -= 1
+		fps = fpsCounter
+		fpsCounter = 0
+	}else{
+		fpsCounter++;
+	}
 
 	if(dt>0.0001){
 		update(dt*TIME_BOOSTER)
-		render()
+		render()//fps
 
 		ONCE_PRESSED_KEYS.clear()
 

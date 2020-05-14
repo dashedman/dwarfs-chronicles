@@ -12,7 +12,7 @@ function startLoop(){
 	hero.update = Alive.prototype.update
 
 	console.log("start")
-	lastTime = Date.now()
+	lastTime = performance.now()
 	frameID = requestAnimationFrame(frame);
 
 }
@@ -387,7 +387,7 @@ function render(){
 		ctx.strokeStyle = "blue"
 		ctx.strokeText(canvas.style.width+" "+canvas.style.height,20,20)
 		ctx.strokeText(canvas.width+" "+canvas.height,20,30)
-		ctx.strokeText(frameID,20,40)
+		ctx.strokeText(fps,20,40)
 		ctx.strokeStyle = "yellow"
 	}
 
