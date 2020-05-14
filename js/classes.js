@@ -174,7 +174,7 @@ class Sprite extends Entity{
 
   debugDraw(dx,dy){
     let p = parallax_f(this.parallax)
-    
+
     ctx.beginPath()
     ctx.moveTo( (this.x + this.width*0.5 - this.texture.frameWidth * this.s * 0.5 + dx)*p +(canvas.width )*0.5,
                 (this.y + this.height*0.5 - this.texture.frameHeight * this.s * 0.5 + dy)*p  +(canvas.height )*0.5)

@@ -167,26 +167,31 @@ function update(dt){
 }
 
 function render(){
-	let dx = (hero.width)*0.5 - hero.x
-	let dy = (hero.height)*0.5 - hero.y
+	let dx =  - hero.x-(hero.width)*0.5
+	let dy =  - hero.y-(hero.height)*0.5
 
 	ctx.clearRect(0,0,canvas.width,canvas.height)
-
 	//foreground
-  for(let i=9;i>=4;i--){
-		for(let obj of LAYERS[i]) obj.draw(dx,dy)
+	for(let i=9;i>=4;i--){
+		for(let obj of LAYERS[i]) {
+			obj.draw(dx,dy)
+			if(DEBUG && i==4)obj.debugDraw(dx,dy)
+		}
 	}
 
 	//alive
-	for(let obj of LAYERS[0]) obj.draw(dx,dy)
-	hero.draw(dx,dy)
+	for(let obj of LAYERS[0]) {
+		obj.draw(dx,dy)
+		if(DEBUG)obj.debugDraw(dx,dy)
+	}
 
 	//background
 	for(let i=3;i>0;i--){
-		for(let obj of LAYERS[i]) obj.draw(dx,dy)
+		for(let obj of LAYERS[i]) {
+			obj.draw(dx,dy)
+			if(DEBUG)obj.debugDraw(dx,dy)
+		}
 	}
-
-	//hero
 
 
 	if(DEBUG){
