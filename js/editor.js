@@ -7,7 +7,7 @@ var grabed = -1
 var texture_in_use = undefined
 var mouseDownX=0,mouseDownY=0,mouseUpX=0,mouseUpY=0,mouseX=0,mouseY=0,mouseIsDown=false
 
-function start(){
+function startLoop(){
 
 	hero.update = Alive.prototype.update
 
@@ -198,7 +198,22 @@ function editlog(dx, dy){
 											texture_in_use.texture.frameWidth * PIXEL_SCALE * p,
 											texture_in_use.texture.frameHeight * PIXEL_SCALE * p)
 				ctx.filter = 'none'
+
+				//new physbox
   			ctx.strokeRect(tmpX+dx,tmpY+dy,tmpW,tmpH)
+
+				ctx.strokeStyle = "magenta"
+				ctx.beginPath()
+				ctx.moveTo(tmpX+dx,0)
+				ctx.lineTo(tmpX+dx,canvas.height)
+				ctx.moveTo(0,tmpY+dy)
+				ctx.lineTo(canvas.width,tmpY+dy)
+				ctx.moveTo(tmpX+dx+tmpW,0)
+				ctx.lineTo(tmpX+dx+tmpW,canvas.height)
+				ctx.moveTo(0,tmpY+dy+tmpH)
+				ctx.lineTo(canvas.width,tmpY+dy+tmpH)
+				ctx.stroke()
+				ctx.closePath()
   		}
   		else {
   			let tmpX = Math.min(mouseUpX,mouseDownX)
@@ -207,7 +222,15 @@ function editlog(dx, dy){
   			let tmpH = Math.max(mouseUpY,mouseDownY)-tmpY
 
   			ctx.strokeRect(tmpX+dx,tmpY+dy,tmpW,tmpH)
-  			ctx.strokeRect(mouseX+dx,mouseY+dy,1,1)
+
+				//cursor
+				ctx.beginPath()
+				ctx.moveTo(mouseX+dx-ceilSize,mouseY+dy)
+				ctx.lineTo(mouseX+dx+ceilSize,mouseY+dy)
+				ctx.moveTo(mouseX+dx,mouseY+dy-ceilSize)
+				ctx.lineTo(mouseX+dx,mouseY+dy+ceilSize)
+				ctx.stroke()
+				ctx.closePath()
   		}
 
   	}

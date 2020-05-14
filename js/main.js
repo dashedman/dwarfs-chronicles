@@ -9,7 +9,7 @@ var frameID = -1
 var lastTime = 0
 var hero = undefined
 
-var map = "forest"
+var map = "parallaxback"
 var mapStructure = undefined
 
 var canvas = document.getElementById("viewport")
@@ -32,7 +32,7 @@ if(window.innerWidth*9 > window.innerHeight*16){
 //ACTIONS
 PRESSED_KEYS.fill(false)
 
-document.addEventListener("DOMContentLoaded",mapPick,{once:true})
+document.addEventListener("DOMContentLoaded",start,{once:true})
 document.addEventListener('keydown', function(event) {
 	PRESSED_KEYS[event.keyCode] = true
 	ONCE_PRESSED_KEYS.add(event.keyCode)
@@ -67,6 +67,9 @@ window.addEventListener("resize", function() {
 */
 })
 
+function start(){
+	mapPick()
+}
 
 ////SCENE
 function mapPick(){
@@ -149,10 +152,10 @@ function initial(){
 
 
 	console.log(LAYERS)
-	start()
+	startLoop()
 }
 ////
-function start(){
+function startLoop(){
 	console.log("start")
 	lastTime = Date.now()
 	frameID = requestAnimationFrame(frame);
