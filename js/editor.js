@@ -29,10 +29,10 @@ document.addEventListener("mousedown",(event)=>{
 	if( PRESSED_KEYS[KEY_G] ){
 			for(let i in LAYERS[usedLayer]){
 				let entity = LAYERS[usedLayer][i]
-				if(	entity.x <= mouseX &&
-						entity.x+entity.width >= mouseX &&
-						entity.y <= mouseY &&
-						entity.y+entity.height >= mouseY ){
+				if(	entity.x <= mouseX-canvas.width*0.5 &&
+						entity.x+entity.width >= mouseX-canvas.width*0.5 &&
+						entity.y <= mouseY-canvas.height*0.5 &&
+						entity.y+entity.height >= mouseY-canvas.height*0.5 ){
 							grabed = i
 							break
 						}
@@ -50,18 +50,9 @@ document.addEventListener("mouseup",(event)=>{
 	mouseUpX = ceil(event.clientX + camera.x - canvas.offsetLeft, ceilSize)
 	mouseUpY = ceil(event.clientY + camera.y - canvas.offsetTop, ceilSize)
 	if(grabed >= 0){
-		if(setMode == "b"){
-			BACKGROUNDS[grabed].x += mouseUpX-mouseDownX
-			BACKGROUNDS[grabed].y += mouseUpY-mouseDownY
-		}
-		if(setMode == "n"){
-			LIFELESSES[grabed].x += mouseUpX-mouseDownX
-			LIFELESSES[grabed].y += mouseUpY-mouseDownY
-		}
-		if(setMode == "m"){
-			ALIVE[grabed].x += mouseUpX-mouseDownX
-			ALIVE[grabed].y += mouseUpY-mouseDownY
-		}
+		LAYERS[usedLayer][grabed].x += mouseUpX-mouseDownX
+		LAYERS[usedLayer][grabed].y += mouseUpY-mouseDownY
+
 		grabed=-1
 	}
 
@@ -175,7 +166,7 @@ function editlog(dx, dy){
   		ctx.closePath()
 
 			let tmp = LAYERS[usedLayer][grabed]
-			ctx.strokeRect(tmp.x+mouseX-mouseDownX+ dx,tmp.y+mouseY-mouseDownY+dy,tmp.width,tmp.height)
+			ctx.strokeRect(tmp.x+mouseX-mouseDownX+ dx + canvas.width*0.5,tmp.y+mouseY-mouseDownY+dy + canvas.height*0.5,tmp.width,tmp.height)
 
   	}else{
   		ctx.strokeStyle = "cyan"
@@ -268,8 +259,8 @@ function editlog(dx, dy){
   	}
 
   	//legend
-		ctx.fillText("x:"+camera.x+" y:"+camera.y,canvas.width*0.5,canvas.height*0.5)
-		ctx.fillText("used Layer: "+ usedLayer,canvas.width*0.5,canvas.height*0.5 + 10)
+		ctx.fillText("x:"+camera.x+" y:"+camera.y,canvas.width-100,122)
+		ctx.fillText("used Layer: "+ usedLayer,canvas.width-100,134)
 
     ctx.fillText("map: "+map,20,50)
     ctx.fillText("wasd: move | c: grid | q&e: change texture",20,62)
