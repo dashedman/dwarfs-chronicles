@@ -328,34 +328,34 @@ function render(){
 	ctx.clearRect(0,0,canvas.width,canvas.height)
 
 	//foreground
-	ctx.filter = 'opacity(0.2)'
+//	ctx.filter = 'opacity(0.2)'
   for(let i=9;i>=4;i--){
-		if(usedLayer == i)ctx.filter = 'none'
+		//if(usedLayer == i)ctx.filter = 'none'
 		for(let obj of LAYERS[i]) {
 			obj.draw(dx,dy)
 			if(DEBUG && usedLayer == i)obj.debugDraw(dx,dy)
 		}
-		if(usedLayer == i)ctx.filter = 'opacity(0.2)'
+	//	if(usedLayer == i)ctx.filter = 'opacity(0.2)'
 	}
 
 	//alive
-	if(usedLayer == 0)ctx.filter = 'none'
+//	if(usedLayer == 0)ctx.filter = 'none'
 	for(let obj of LAYERS[0]) {
 		obj.draw(dx,dy)
 		if(DEBUG && usedLayer == 0)obj.debugDraw(dx,dy)
 	}
-	if(usedLayer == 0)ctx.filter = 'opacity(0.2)'
+	//if(usedLayer == 0)ctx.filter = 'opacity(0.2)'
 
 	//background
 	for(let i=3;i>0;i--){
-		if(usedLayer == i)ctx.filter = 'none'
+	//	if(usedLayer == i)ctx.filter = 'none'
 		for(let obj of LAYERS[i]) {
 			obj.draw(dx,dy)
 			if(DEBUG && usedLayer == i)obj.debugDraw(dx,dy)
 		}
-		if(usedLayer == i)ctx.filter = 'opacity(0.2)'
+		//if(usedLayer == i)ctx.filter = 'opacity(0.2)'
 	}
-	ctx.filter = 'none'
+//	ctx.filter = 'none'
 
 
 	editlog(dx, dy)
