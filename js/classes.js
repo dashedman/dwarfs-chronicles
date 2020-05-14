@@ -34,19 +34,17 @@ class Camera{
         this.y += 1000*dt
   		}
   }
-  draw(dx,dy){
-  		ctx.fillText("x:"+this.x+" y:"+this.y,this.x+dx,this.y+dy)
-  }
 }
 
 
 class Entity{
-  constructor(x=0,y=0,w=1,h=1,s=PIXEL_SCALE,type=0){
+  constructor(x=0,y=0,w=1,h=1,s=PIXEL_SCALE, type=0, parallax = 0){
     this.x = x
     this.y = y
     this.s = s
     this.width = w*s
     this.height = h*s
+    this.parallax = parallax
 
 		this.type = type
 
@@ -152,56 +150,69 @@ class Entity{
 
 
 class Sprite extends Entity{
-  constructor(x=0,y=0,w=1,h=1,s=PIXEL_SCALE,source="",type=0){
-    super(x,y,w,h,s,type)
+  constructor(x=0,y=0,w=1,h=1,s=PIXEL_SCALE,source="", type=0, parallax = 0){
+    super(x,y,w,h,s,type,parallax)
     this.texture = TEXTURE_LIST.get(source)
     this.frameStatus = 0
     this.source = source
   }
   draw(dx=0,dy=0){
+    let p = parallax_f(this.parallax)
     ctx.drawImage(this.texture.data,
                   Math.floor(this.frameStatus/this.texture.frameSpeed)*this.texture.frameWidth,
                   0,
                   this.texture.frameWidth,
                   this.texture.frameHeight,
-                  this.x + this.width*0.5 - this.texture.frameWidth * this.s * 0.5 +dx,
-									this.y + this.height*0.5 - this.texture.frameHeight * this.s * 0.5 +dy,
-                  this.texture.frameWidth * this.s,
-                  this.texture.frameHeight * this.s)
-    if(DEBUG){
-      ctx.strokeRect( this.x + this.width*0.5 - this.texture.frameWidth * this.s * 0.5 +dx,
-                      this.y + this.height*0.5 - this.texture.frameHeight * this.s * 0.5 +dy,
-                      this.texture.frameWidth*this.s,
-                      this.texture.frameHeight*this.s)
-      ctx.fillText("tw:"+this.texture.frameWidth + " th:"+this.texture.frameHeight,this.x+dx,this.y+dy+30)
-      if(this.collideFlag){
-        ctx.strokeStyle = "green"
-        ctx.strokeRect( this.x+1+dx,
-                        this.y+1+dy,
-                        this.width-2,
-                        this.height-2 )
-      }else{
-        ctx.strokeStyle = "blue"
-        ctx.strokeRect( this.x+dx,
-                        this.y+dy,
-                        this.width,
-                        this.height)
-
-      }
-      ctx.fillText("x:"+this.x + " y:"+this.y,this.x+dx,this.y+dy+10)
-      ctx.fillText("w:"+this.width + " h:"+this.height,this.x+dx,this.y+dy+20)
-      ctx.strokeStyle = "yellow"
-
-    }
+                  (this.x + this.width*0.5 - this.texture.frameWidth * this.s * 0.5 +dx)*p +(canvas.width )*0.5,
+									(this.y + this.height*0.5 - this.texture.frameHeight * this.s * 0.5 +dy)*p  +(canvas.height )*0.5,
+                  this.texture.frameWidth * this.s * p,
+                  this.texture.frameHeight * this.s * p)
   }
   update(dt){
     this.frameStatus = (this.frameStatus+dt*100)%(this.texture.frames*this.texture.frameSpeed)
   }
+
+  debugDraw(dx,dy){
+    let p = parallax_f(this.parallax)
+    
+    ctx.beginPath()
+    ctx.moveTo( (this.x + this.width*0.5 - this.texture.frameWidth * this.s * 0.5 + dx)*p +(canvas.width )*0.5,
+                (this.y + this.height*0.5 - this.texture.frameHeight * this.s * 0.5 + dy)*p  +(canvas.height )*0.5)
+    ctx.lineTo(this.x+dx +canvas.width *0.5,this.y+dy +canvas.height *0.5,)
+    ctx.stroke()
+    ctx.closePath()
+    //texture box
+    ctx.strokeRect( (this.x + this.width*0.5 - this.texture.frameWidth * this.s * 0.5 + dx)*p +(canvas.width )*0.5,
+                    (this.y + this.height*0.5 - this.texture.frameHeight * this.s * 0.5 + dy)*p  +(canvas.height )*0.5,
+                    this.texture.frameWidth*this.s* p,
+                    this.texture.frameHeight*this.s* p)
+
+    //physics box
+    if(this.collideFlag){
+      ctx.strokeStyle = "green"
+      ctx.strokeRect( this.x+dx +canvas.width *0.5,
+                      this.y+dy +canvas.height *0.5,
+                      this.width,
+                      this.height)
+    }else{
+      ctx.strokeStyle = "blue"
+      ctx.strokeRect( this.x+dx +canvas.width *0.5,
+                      this.y+dy +canvas.height *0.5,
+                      this.width,
+                      this.height)
+
+    }
+    //stats
+    ctx.fillText("x:"+this.x + " y:"+this.y,this.x + canvas.width*0.5 + dx,this.y + canvas.height*0.5 + dy +10)
+    ctx.fillText("w:"+this.width + " h:"+this.height,this.x + canvas.width*0.5 + dx,this.y + canvas.height*0.5 + dy +20)
+    ctx.fillText("tw:"+this.texture.frameWidth + " th:"+this.texture.frameHeight,this.x + canvas.width*0.5 + dx,this.y + canvas.height*0.5 + dy +30)
+    ctx.strokeStyle = "yellow"
+  }
 }
 
-class Alive extends Entity{
-  constructor(x=0,y=0,w=1,h=1,s=PIXEL_SCALE,source="",type = 0){
-    super(x,y,w,h,s,type)
+class Alive extends Sprite{
+  constructor(x=0,y=0,w=1,h=1,s=PIXEL_SCALE,source="",type = 0,parallax = 0){
+    super(x,y,w,h,s,source+"_stay",type,parallax)
     this.speedX = 0
     this.speedY = 0
 		this.accelerationX = 200
@@ -221,7 +232,6 @@ class Alive extends Entity{
     this.animationList[ANIMATION_STATE_JUMP] = TEXTURE_LIST.get(source+"_jump")
     this.animationList[ANIMATION_STATE_JUMP_END] = TEXTURE_LIST.get(source+"_jump_end")
 
-    this.curentAnimation = this.animationList[ANIMATION_STATE_STAY]
 
   }
 
@@ -231,56 +241,68 @@ class Alive extends Entity{
 
     this.frameStatus = 0
     this.entityState = newState
-    this.curentAnimation = this.animationList[this.entityState]
+    this.texture = this.animationList[this.entityState]
   }
 
 
   draw(dx=0,dy=0){
       if(this.direction<0){
-        ctx.translate((this.x+dx)*2+this.width, 0)
+        ctx.translate((this.x+dx)*2+this.width+canvas.width , 0)
         ctx.scale(-1,1)
       }
 
-      ctx.drawImage(this.curentAnimation.data,
-                    Math.floor(this.frameStatus/this.curentAnimation.frameSpeed)*this.curentAnimation.frameWidth,
+      let p = parallax_f(this.parallax)
+      ctx.drawImage(this.texture.data,
+                    Math.floor(this.frameStatus/this.texture.frameSpeed)*this.texture.frameWidth,
                     0,
-                    this.curentAnimation.frameWidth,
-                    this.curentAnimation.frameHeight,
-                    this.x + this.width*0.5 - this.curentAnimation.frameWidth * this.s * 0.5 +dx,
-                    this.y + this.height*0.5 - this.curentAnimation.frameHeight * this.s * 0.5 +dy,
-                    this.curentAnimation.frameWidth * this.s,
-                    this.curentAnimation.frameHeight * this.s)
+                    this.texture.frameWidth,
+                    this.texture.frameHeight,
+                    (this.x + this.width*0.5 - this.texture.frameWidth * this.s * 0.5 +dx)*p +(canvas.width )*0.5,
+  									(this.y + this.height*0.5 - this.texture.frameHeight * this.s * 0.5 +dy)*p  +(canvas.height )*0.5,
+                    this.texture.frameWidth * this.s * p,
+                    this.texture.frameHeight * this.s * p)
 
       if(this.direction<0){
-        ctx.translate((this.x+dx)*2+this.width, 0)
+        ctx.translate((this.x+dx)*2+this.width+canvas.width, 0)
         ctx.scale(-1,1)
-      }
-      if(DEBUG){
-        ctx.strokeRect( this.x + this.width*0.5 - this.curentAnimation.frameWidth * this.s * 0.5 +dx,
-                        this.y + this.height*0.5 - this.curentAnimation.frameHeight * this.s * 0.5 +dy,
-                        this.curentAnimation.frameWidth*this.s,
-                        this.curentAnimation.frameHeight*this.s)
-        ctx.strokeStyle = "blue"
-        ctx.strokeRect( this.x+dx,
-                        this.y+dy,
-                        this.width,
-                        this.height)
-        ctx.strokeStyle = "yellow"
-    		ctx.fillText("x:"+this.x+" y:"+this.y,this.x+dx,this.y+dy-25)
-    		ctx.fillText("dx:"+this.speedX+" dy:"+this.speedY,this.x+dx,this.y+dy-15)
-        ctx.fillText("state:"+this.entityState+" frame:"+this.frameStatus,this.x+dx,this.y+dy-5)
       }
     }
 
     update = function(dt){
-        this.frameStatus = (this.frameStatus+dt*100)%(this.curentAnimation.frames*this.curentAnimation.frameSpeed)
+        this.frameStatus = (this.frameStatus+dt*100)%(this.texture.frames*this.texture.frameSpeed)
+    }
+    debugDraw(dx,dy){
+      let p = parallax_f(this.parallax)
+
+      ctx.beginPath()
+      ctx.moveTo( (this.x + this.width*0.5 - this.texture.frameWidth * this.s * 0.5 + dx)*p +(canvas.width )*0.5,
+                  (this.y + this.height*0.5 - this.texture.frameHeight * this.s * 0.5 + dy)*p  +(canvas.height )*0.5)
+      ctx.lineTo(this.x+dx +canvas.width *0.5,this.y+dy +canvas.height *0.5,)
+      ctx.stroke()
+      ctx.closePath()
+      //texture box
+      ctx.strokeRect( (this.x + this.width*0.5 - this.texture.frameWidth * this.s * 0.5 + dx)*p +(canvas.width )*0.5,
+                      (this.y + this.height*0.5 - this.texture.frameHeight * this.s * 0.5 + dy)*p  +(canvas.height )*0.5,
+                      this.texture.frameWidth*this.s* p,
+                      this.texture.frameHeight*this.s* p)
+      //physics box
+      ctx.strokeStyle = "blue"
+      ctx.strokeRect( this.x+dx + canvas.width*0.5,
+                      this.y+dy + canvas.height*0.5,
+                      this.width,
+                      this.height)
+      //stats
+      ctx.strokeStyle = "yellow"
+      ctx.fillText("x:"+this.x+" y:"+this.y,this.x + canvas.width*0.5 + dx,this.y + canvas.height*0.5 + dy -25)
+      ctx.fillText("dx:"+this.speedX+" dy:"+this.speedY,this.x + canvas.width*0.5 + dx,this.y + canvas.height*0.5 + dy -15)
+      ctx.fillText("state:"+this.entityState+" frame:"+this.frameStatus,this.x + canvas.width*0.5 + dx,this.y + canvas.height*0.5 + dy -5)
     }
 }
 
 
 class Humanity extends Alive{
-  constructor(x=0,y=0,w=1,h=1,s=PIXEL_SCALE,source="",type=0, seat_height=1){
-    super(x,y,w,h,s,source,type)
+  constructor(x=0,y=0,w=1,h=1,s=PIXEL_SCALE,source="",type=0,parallax=0, seat_height=1){
+    super(x,y,w,h,s,source,type,parallax=0)
 
     this.seatFlag = false
     this.seat_height = seat_height * this.s
@@ -296,7 +318,7 @@ class Humanity extends Alive{
 
   inTonel(){
     let tmpY = this.y + this.height - this.stay_height
-    for(let shape of LIFELESSES){
+    for(let shape of LAYERS[4]){
       if( shape.x < this.x+this.width &&
           shape.x+shape.width > this.x &&
           shape.y+shape.height >= tmpY &&
@@ -322,14 +344,14 @@ class Humanity extends Alive{
 
     this.frameStatus=0
     this.entityState = newState
-    this.curentAnimation = this.animationList[this.entityState]
+    this.texture = this.animationList[this.entityState]
   }
 }
 
 
 class Hero extends Humanity{
-	constructor(x=0,y=0,w=1,h=1,s=PIXEL_SCALE,source="",type=0, seat_height=1){
-    super(x,y,w,h,s,source,type, seat_height)
+	constructor(x=0,y=0,w=1,h=1,s=PIXEL_SCALE,source="",type=0, parallax=0, seat_height=1){
+    super(x,y,w,h,s,source,type, parallax, seat_height)
   }
 
 
@@ -346,7 +368,7 @@ class Hero extends Humanity{
 
     this.frameStatus=0
     this.entityState = newState
-    this.curentAnimation = this.animationList[this.entityState]
+    this.texture = this.animationList[this.entityState]
   }
 
 
@@ -359,7 +381,7 @@ class Hero extends Humanity{
     switch(this.entityState){
 
       case ANIMATION_STATE_JUMP_READY:
-        if(this.frameStatus > (this.curentAnimation.frames-1) * this.curentAnimation.frameSpeed){
+        if(this.frameStatus > (this.texture.frames-1) * this.texture.frameSpeed){
           newState = ANIMATION_STATE_JUMP
           this.speedY = -this.jumpPower * GRAVITY
         }
@@ -367,14 +389,14 @@ class Hero extends Humanity{
         break
 
       case ANIMATION_STATE_JUMP_END:
-        if(this.frameStatus > (this.curentAnimation.frames-1) * this.curentAnimation.frameSpeed){
+        if(this.frameStatus > (this.texture.frames-1) * this.texture.frameSpeed){
           this.onFloor = true
         }
         else newState = ANIMATION_STATE_JUMP_END
         break
 
       case ANIMATION_STATE_SITING:
-        if(this.frameStatus > (this.curentAnimation.frames-1) * this.curentAnimation.frameSpeed){
+        if(this.frameStatus > (this.texture.frames-1) * this.texture.frameSpeed){
           newState = ANIMATION_STATE_SEAT
           this.seatFlag = true
         }
@@ -382,7 +404,7 @@ class Hero extends Humanity{
         break
 
       case ANIMATION_STATE_UPING:
-        if(this.frameStatus > (this.curentAnimation.frames-1) * this.curentAnimation.frameSpeed){
+        if(this.frameStatus > (this.texture.frames-1) * this.texture.frameSpeed){
           this.seatFlag = false
         }
         else newState = ANIMATION_STATE_UPING
@@ -431,7 +453,7 @@ class Hero extends Humanity{
 
     let stopSpeedXFlag = false
     let stopSpeedYFlag = false
-		for(let shape of LIFELESSES){
+		for( let shape of LAYERS[4] ){
       //collides
 			let [normalX,normalY] = shape.collide(this)
       if(normalX || normalY){
@@ -482,7 +504,7 @@ class Hero extends Humanity{
     if(this.entityState != newState){
       this.stateUpdate(newState)
     }else this.frameStatus = (this.frameStatus+dt*100)
-                              %(this.curentAnimation.frames*this.curentAnimation.frameSpeed)
+                              %(this.texture.frames*this.texture.frameSpeed)
 
 	}
 }

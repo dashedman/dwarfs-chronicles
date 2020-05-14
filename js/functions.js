@@ -10,6 +10,10 @@ function ceil(x,y){
 	return Math.round(x/y)*y
 }
 
+function parallax_f(p){
+  return Math.pow(2,-p)//(PARALLAX_COEFFICIENT-p)/PARALLAX_COEFFICIENT
+}
+
 function getMapName(){
   return new Promise(function(resolve,reject){
     const popup = document.querySelector("#popup");
@@ -32,49 +36,34 @@ function mapToJson(){
     if(x instanceof Alive)return "alive"
   }
 
-  let jm = {"textures":{},"backgrounds":[],"lifelesses":[],"alives":[],hero:{}}
+  let jm = {"textures":{},"layers":[],hero:{}}
   for(let [name,texture] of TEXTURE_LIST){
     jm.textures[name] = { "name":texture.data.src.substring(texture.data.src.lastIndexOf("/")+1),
                           "frames":texture.frames,
                           "frameSpeed":texture.frameSpeed }
   }
 
-  for(let entity of BACKGROUNDS){
-    let class_type = getClassType(entity)
-    jm.backgrounds.push( {  "x":entity.x,
-                            "y":entity.y,
-                            "width":entity.width/entity.s,
-                            "height":entity.height/entity.s,
-                            "scale":entity.s,
-                            "texture_name":entity.source,
-                            "class_type":class_type} )
+  for(let i=0;i<10;i++ ){
+    jm.layers.push(new Array())
+    for(let entity of LAYERS[i]){
+      let class_type = getClassType(entity)
+      jm.layers[i].push( {  "x":entity.x,
+                              "y":entity.y,
+                              "width":entity.width/entity.s,
+                              "height":entity.height/entity.s,
+                              "scale":entity.s,
+                              "texture_name":entity.source,
+                              "class_type":class_type} )
+    }
   }
-  for(let entity of LIFELESSES){
-    let class_type = getClassType(entity)
-    jm.lifelesses.push( { "x":entity.x,
-                          "y":entity.y,
-                          "width":entity.width/entity.s,
-                          "height":entity.height/entity.s,
-                          "scale":entity.s,
-                          "texture_name":entity.source,
-                          "class_type":class_type} )
-  }
-  for(let entity of ALIVES){
-    let class_type = getClassType(entity)
-    jm.alive.push( {  "x":entity.x,
-                      "y":entity.y,
-                      "width":entity.width/entity.s,
-                      "height":entity.height/entity.s,
-                      "scale":entity.s,
-                      "texture_name":entity.source,
-                      "class_type":class_type} )
-  }
+
+
   jm.hero = {
     "x":hero.x,
     "y":hero.y,
     "width":hero.width/hero.s,
     "height":hero.height/hero.s,
-    "scale":entity.s,
+    "scale":hero.s,
     "seat_height":hero.seat_height,
     "race":hero.source
   }

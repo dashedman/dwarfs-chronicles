@@ -1,10 +1,21 @@
 
 //editor
 var camera = new Camera()
-var setMode = "b"
+
+var usedLayer = 4
 var grabed = -1
 var texture_in_use = undefined
 var mouseDownX=0,mouseDownY=0,mouseUpX=0,mouseUpY=0,mouseX=0,mouseY=0,mouseIsDown=false
+
+function start(){
+
+	hero.update = Alive.prototype.update
+
+	console.log("start")
+	lastTime = Date.now()
+	frameID = requestAnimationFrame(frame);
+
+}
 const ceilSize = 10
 
 
@@ -12,56 +23,32 @@ const ceilSize = 10
 document.addEventListener("mousedown",(event)=>{
 	mouseIsDown = true
   //
-	mouseDownX = ceil(event.clientX + camera.x - canvas.width*0.5 - canvas.offsetLeft,  ceilSize)
-	mouseDownY = ceil(event.clientY + camera.y - canvas.height*0.5 - canvas.offsetTop, ceilSize)
+	mouseDownX = ceil(event.clientX + camera.x - canvas.offsetLeft,  ceilSize)
+	mouseDownY = ceil(event.clientY + camera.y - canvas.offsetTop, ceilSize)
 
 	if( PRESSED_KEYS[KEY_G] ){
-			if(setMode == "m"){
-				for(let i in ALIVES){
-					let entity = ALIVES[i]
-					if(	entity.x<mouseX &&
-							entity.x+entity.width > mouseX &&
-							entity.y<mouseY &&
-							entity.y+entity.height > mouseY ){
-								grabed = i
-								break
-							}
-				}
+			for(let i in LAYERS[usedLayer]){
+				let entity = LAYERS[usedLayer][i]
+				if(	entity.x <= mouseX &&
+						entity.x+entity.width >= mouseX &&
+						entity.y <= mouseY &&
+						entity.y+entity.height >= mouseY ){
+							grabed = i
+							break
+						}
 			}
-			if(setMode == "n"){
-				for(let i in LIFELESSES){
-					let entity = LIFELESSES[i]
-					if(	entity.x<mouseX &&
-							entity.x+entity.width > mouseX &&
-							entity.y<mouseY &&
-							entity.y+entity.height > mouseY ){
-								grabed = i
-							}
 
-				}
-			}
-			if(setMode == "b"){
-				for(let i in BACKGROUNDS){
-					let entity = BACKGROUNDS[i]
-					if(	entity.x<mouseX &&
-							entity.x+entity.width > mouseX &&
-							entity.y<mouseY &&
-							entity.y+entity.height > mouseY ){
-								grabed = i
-							}
-				}
-			}
-		}
+	}
 })
 document.addEventListener("mousemove",(event)=>{
-	mouseX = ceil(event.clientX + camera.x - canvas.width*0.5 - canvas.offsetLeft, ceilSize)
-	mouseY = ceil(event.clientY + camera.y - canvas.height*0.5 - canvas.offsetTop, ceilSize)
+	mouseX = ceil(event.clientX + camera.x - canvas.offsetLeft, ceilSize)
+	mouseY = ceil(event.clientY + camera.y - canvas.offsetTop, ceilSize)
 
 })
 document.addEventListener("mouseup",(event)=>{
 	mouseIsDown = false
-	mouseUpX = ceil(event.clientX + camera.x - canvas.width*0.5 - canvas.offsetLeft, ceilSize)
-	mouseUpY = ceil(event.clientY + camera.y - canvas.height*0.5 - canvas.offsetTop, ceilSize)
+	mouseUpX = ceil(event.clientX + camera.x - canvas.offsetLeft, ceilSize)
+	mouseUpY = ceil(event.clientY + camera.y - canvas.offsetTop, ceilSize)
 	if(grabed >= 0){
 		if(setMode == "b"){
 			BACKGROUNDS[grabed].x += mouseUpX-mouseDownX
@@ -79,6 +66,90 @@ document.addEventListener("mouseup",(event)=>{
 	}
 
 })
+
+
+
+function editorUpdate(dt){
+	let dx = -camera.x
+	let dy = -camera.y
+	//texture left
+	if( ONCE_PRESSED_KEYS.has(KEY_Q) ){
+		let oldkey = undefined
+		for(let [key, texture] of TEXTURE_LIST){
+			if(key == texture_in_use.key){
+				if( oldkey )texture_in_use = {key:oldkey,texture:TEXTURE_LIST.get(oldkey)}
+				break
+			}
+
+			oldkey = key
+		}
+	}
+	//texture rigth
+	if( ONCE_PRESSED_KEYS.has(KEY_E) ){
+		let oldkey = null
+		for(let [key, texture] of TEXTURE_LIST){
+			if(oldkey == texture_in_use.key){
+				texture_in_use = {key:key,texture:texture}
+				break
+			}
+
+			oldkey = key
+		}
+	}
+
+	//mod change
+	if( ONCE_PRESSED_KEYS.has(KEY_ZERO) )	usedLayer = 0
+	if( ONCE_PRESSED_KEYS.has(KEY_ONE) )	usedLayer = 1
+	if( ONCE_PRESSED_KEYS.has(KEY_TWO) )	usedLayer = 2
+	if( ONCE_PRESSED_KEYS.has(KEY_THREE) )usedLayer = 3
+	if( ONCE_PRESSED_KEYS.has(KEY_FOUR) )	usedLayer = 4
+	if( ONCE_PRESSED_KEYS.has(KEY_FIVE) )	usedLayer = 5
+	if( ONCE_PRESSED_KEYS.has(KEY_SIX) )	usedLayer = 6
+	if( ONCE_PRESSED_KEYS.has(KEY_SEVEN) )usedLayer = 7
+	if( ONCE_PRESSED_KEYS.has(KEY_EIGHT) )usedLayer = 8
+	if( ONCE_PRESSED_KEYS.has(KEY_NINE) )	usedLayer = 9
+
+	//set entity
+	if( ONCE_PRESSED_KEYS.has(KEY_SPACE) ){
+		let tmpX = Math.min(mouseUpX,mouseDownX)
+		let tmpY = Math.min(mouseUpY,mouseDownY)
+		let tmpW = (Math.max(mouseUpX,mouseDownX)-tmpX)/PIXEL_SCALE
+		let tmpH = (Math.max(mouseUpY,mouseDownY)-tmpY)/PIXEL_SCALE
+
+		let parallax = (0<usedLayer && usedLayer<3)?usedLayer-3:((usedLayer>5)?usedLayer-5:0 )
+
+		if(usedLayer > 0)LAYERS[usedLayer].push( new Sprite(tmpX-canvas.width*0.5,tmpY-canvas.height*0.5,tmpW,tmpH,PIXEL_SCALE,texture_in_use.key,TYPE_BOX,parallax) )
+
+	}
+	//delete entity
+	if( ONCE_PRESSED_KEYS.has(KEY_X) ){
+
+		for(let i in LAYERS[usedLayer]){
+			let entity = LAYERS[usedLayer][i]
+			if(	entity.x <= mouseX-canvas.width*0.5 &&
+					entity.x+entity.width >= mouseX-canvas.width*0.5 &&
+					entity.y <= mouseY-canvas.height*0.5 &&
+					entity.y+entity.height >= mouseY-canvas.height*0.5 ){
+						LAYERS[usedLayer].splice(i,1)
+						break
+					}
+		}
+
+	}
+
+	//alert map json
+	if( ONCE_PRESSED_KEYS.has(KEY_R) ){
+		let jm = mapToJson()
+		alert("----------------------------\n"+jm+"\n----------------------------")
+	}
+
+	//download map json
+	if( ONCE_PRESSED_KEYS.has(KEY_T) ){
+		let jm = mapToJson()
+		downloadJson(jm)
+	}
+
+}
 
 function editlog(dx, dy){
 
@@ -103,38 +174,29 @@ function editlog(dx, dy){
   		ctx.stroke()
   		ctx.closePath()
 
-  		if(setMode == "b"){
-  			let tmp = BACKGROUNDS[grabed]
-  			ctx.strokeRect(tmp.x+mouseX-mouseDownX+ dx,tmp.y+mouseY-mouseDownY+dy,tmp.width,tmp.height)
-  		}
-  		if(setMode == "n"){
-  			let tmp = LIFELESSES[grabed]
-  			ctx.strokeRect(tmp.x+mouseX-mouseDownX+ dx,tmp.y+mouseY-mouseDownY+dy,tmp.width,tmp.height)
-  		}
-  		if(setMode == "m"){
-  			let tmp = ALIVE[grabed]
-  			ctx.strokeRect(tmp.x+mouseX-mouseDownX+ dx,tmp.y+mouseY-mouseDownY+dy,tmp.width,tmp.height)
-  		}
+			let tmp = LAYERS[usedLayer][grabed]
+			ctx.strokeRect(tmp.x+mouseX-mouseDownX+ dx,tmp.y+mouseY-mouseDownY+dy,tmp.width,tmp.height)
 
   	}else{
   		ctx.strokeStyle = "cyan"
-
 
   		if(mouseIsDown){
   			let tmpX = Math.min(mouseX,mouseDownX)
   			let tmpY = Math.min(mouseY,mouseDownY)
   			let tmpW = Math.max(mouseX,mouseDownX)-tmpX
   			let tmpH = Math.max(mouseY,mouseDownY)-tmpY
+
+				let p = parallax_f( (0<usedLayer && usedLayer<3)?usedLayer-3:((usedLayer>5)?usedLayer-5:0 ) )
 				ctx.filter = 'opacity(0.5)'
 				ctx.drawImage(texture_in_use.texture.data,
 											0,
 											0,
 											texture_in_use.texture.frameWidth,
 											texture_in_use.texture.frameHeight,
-											tmpX + tmpW*0.5 - texture_in_use.texture.frameWidth * PIXEL_SCALE * 0.5 +dx,
-											tmpY + tmpH*0.5 - texture_in_use.texture.frameHeight * PIXEL_SCALE * 0.5 +dy,
-											texture_in_use.texture.frameWidth * PIXEL_SCALE,
-											texture_in_use.texture.frameHeight * PIXEL_SCALE)
+											(tmpX + tmpW*0.5 - texture_in_use.texture.frameWidth * PIXEL_SCALE * 0.5 + dx - canvas.width*0.5) * p + canvas.width*0.5,
+											(tmpY + tmpH*0.5 - texture_in_use.texture.frameHeight * PIXEL_SCALE * 0.5 + dy - canvas.height*0.5) * p  + canvas.height*0.5,
+											texture_in_use.texture.frameWidth * PIXEL_SCALE * p,
+											texture_in_use.texture.frameHeight * PIXEL_SCALE * p)
 				ctx.filter = 'none'
   			ctx.strokeRect(tmpX+dx,tmpY+dy,tmpW,tmpH)
   		}
@@ -151,11 +213,21 @@ function editlog(dx, dy){
   	}
 
 
+		if( PRESSED_KEYS[ KEY_P ]){
+  		ctx.fillStyle = "lime"
+			ctx.font = "40px caption";
+			for(let i=0;i<LAYERS.length; i++)
+			for(let obj of LAYERS[i]){
+				ctx.fillText(i, obj.x + canvas.width*0.5 + dx, obj.y + canvas.height*0.5 + dy + 32)
+			}
+			ctx.font = "12px caption";
+  		ctx.fillStyle = "yellow"
+  	}
   	//grid
   	if( PRESSED_KEYS[ KEY_C ]){
   		ctx.strokeStyle = "gray"
-  		let tmpX = getCeilMouse(camera.x - canvas.width*0.5)
-  		let tmpY = getCeilMouse(camera.y - canvas.height*0.5)
+			let tmpX = ceil(camera.x - canvas.width*0.5, ceilSize)
+  		let tmpY = ceil(camera.y - canvas.height*0.5, ceilSize)
   		let tmpW = Math.floor(canvas.width / ceilSize)
   		let tmpH = Math.floor(canvas.height / ceilSize)
   		ctx.beginPath()
@@ -173,14 +245,14 @@ function editlog(dx, dy){
   	}
 
   	//legend
-  	ctx.fillStyle = "red"
-  	ctx.fillText("mod: "+ setMode,canvas.width*0.5,canvas.height*0.5 + 10)
-  	ctx.fillStyle = "yellow"
+		ctx.fillText("x:"+camera.x+" y:"+camera.y,canvas.width*0.5,canvas.height*0.5)
+		ctx.fillText("used Layer: "+ usedLayer,canvas.width*0.5,canvas.height*0.5 + 10)
+
     ctx.fillText("map: "+map,20,50)
-    ctx.fillText("wasd:move | c:grid | q&e:change texture",20,60)
-  	ctx.fillText("b:background mode | n:lifelesses mode | m:alive mode",20,70)
-  	ctx.fillText("space:set entity | x:delete entity | g:grab entity",20,80)
-  	ctx.fillText("r:save map to buffer | t:save map to file",20,90)
+    ctx.fillText("wasd: move | c: grid | q&e: change texture",20,62)
+  	ctx.fillText("0-9: change layer | p:show layer",20,74)
+  	ctx.fillText("space: set entity | x: delete entity | g: grab entity",20,86)
+  	ctx.fillText("r: save map to buffer | t: save map to file",20,98)
 }
 
 function mapPick(){
@@ -237,134 +309,56 @@ function loadData(){
 
 function update(dt){
 
+	for(let layer of LAYERS){
+		for(let obj of layer){
+			obj.update(dt)
+		}
+	}
   camera.update(dt)
-  for(let i=0;i<ALIVES.length;i++)ALIVES[i].update(dt)
-  for(let i=0;i<LIFELESSES.length;i++)LIFELESSES[i].update(dt)
-  for(let i=0;i<BACKGROUNDS.length;i++)BACKGROUNDS[i].update(dt)
 
 	//EDITOR
+	editorUpdate(dt)
 
-	//texture left
-	if( ONCE_PRESSED_KEYS.has(KEY_Q) ){
-		let oldkey = undefined
-		for(let [key, texture] of TEXTURE_LIST){
-			if(key == texture_in_use.key){
-				if( oldkey )texture_in_use = {key:oldkey,texture:TEXTURE_LIST.get(oldkey)}
-				break
-			}
-
-			oldkey = key
-		}
-	}
-	//texture rigth
-	if( ONCE_PRESSED_KEYS.has(KEY_E) ){
-		let oldkey = null
-		for(let [key, texture] of TEXTURE_LIST){
-			if(oldkey == texture_in_use.key){
-				texture_in_use = {key:key,texture:texture}
-				break
-			}
-
-			oldkey = key
-		}
-	}
-	//mod change
-	if( ONCE_PRESSED_KEYS.has(KEY_B) ){
-		setMode = "b"
-	}
-	if( ONCE_PRESSED_KEYS.has(KEY_N) ){
-		setMode = "n"
-	}
-	if( ONCE_PRESSED_KEYS.has(KEY_M) ){
-		setMode = "m"
-	}
-	//set entity
-	if( ONCE_PRESSED_KEYS.has(KEY_SPACE) ){
-		let tmpX = Math.min(mouseUpX,mouseDownX)
-		let tmpY = Math.min(mouseUpY,mouseDownY)
-		let tmpW = (Math.max(mouseUpX,mouseDownX)-tmpX)/PIXEL_SCALE
-		let tmpH = (Math.max(mouseUpY,mouseDownY)-tmpY)/PIXEL_SCALE
-
-		if(setMode == "b"){
-			BACKGROUNDS.push(new Sprite(tmpX,tmpY,tmpW,tmpH,PIXEL_SCALE,texture_in_use.key))
-		}
-		if(setMode == "n"){
-			LIFELESSES.push(new Sprite(tmpX,tmpY,tmpW,tmpH,PIXEL_SCALE,texture_in_use.key))
-		}
-		if(setMode == "m"){
-			ALIVE.push(new Sprite(tmpX,tmpY,tmpW,tmpH,PIXEL_SCALE,texture_in_use.key))
-		}
-	}
-	//delete entity
-	if( ONCE_PRESSED_KEYS.has(KEY_X) ){
-		let deleted = false
-		for(let i in ALIVES){
-			let entity = ALIVES[i]
-			if(deleted)break
-			if(	entity.x<=mouseX &&
-					entity.x+entity.width >= mouseX &&
-					entity.y<=mouseY &&
-					entity.y+entity.height >= mouseY ){
-						deleted = true
-						ALIVE.splice(i,1)
-					}
-
-		}
-		for(let i in LIFELESSES){
-			let entity = LIFELESSES[i]
-			if(deleted)break
-			if(	entity.x<=mouseX &&
-					entity.x+entity.width >= mouseX &&
-					entity.y<=mouseY &&
-					entity.y+entity.height >= mouseY ){
-						deleted = true
-						LIFELESSES.splice(i,1)
-					}
-
-		}
-		for(let i in BACKGROUNDS){
-			let entity = BACKGROUNDS[i]
-			if(deleted)break
-			if(	entity.x<=mouseX &&
-					entity.x+entity.width >= mouseX &&
-					entity.y<=mouseY &&
-					entity.y+entity.height >= mouseY ){
-						deleted = true
-						BACKGROUNDS.splice(i,1)
-					}
-
-		}
-	}
-
-  //alert map json
-	if( ONCE_PRESSED_KEYS.has(KEY_R) ){
-		let jm = mapToJson()
-		alert("----------------------------\n"+jm+"\n----------------------------")
-	}
-
-  //download map json
-	if( ONCE_PRESSED_KEYS.has(KEY_T) ){
-		let jm = mapToJson()
-		downloadText(jm)
-	}
 }
 
 function render(){
-  let dx = canvas.width*0.5 - camera.x
-	let dy = canvas.height*0.5 - camera.y
+	let dx = -camera.x
+	let dy = -camera.y
 
 	ctx.clearRect(0,0,canvas.width,canvas.height)
-  //background
-  for(let i=0;i<BACKGROUNDS.length;i++)BACKGROUNDS[i].draw(dx,dy)
 
-  //other entity
-  for(let i=0;i<LIFELESSES.length;i++)LIFELESSES[i].draw(dx,dy)
-  for(let i=0;i<ALIVES.length;i++)ALIVES[i].draw(dx,dy)
+	//foreground
+	ctx.filter = 'opacity(0.2)'
+  for(let i=9;i>=4;i--){
+		if(usedLayer == i)ctx.filter = 'none'
+		for(let obj of LAYERS[i]) {
+			obj.draw(dx,dy)
+			if(DEBUG && usedLayer == i)obj.debugDraw(dx,dy)
+		}
+		if(usedLayer == i)ctx.filter = 'opacity(0.2)'
+	}
 
-	//hero
-	hero.draw(dx,dy)
+	//alive
+	if(usedLayer == 0)ctx.filter = 'none'
+	for(let obj of LAYERS[0]) {
+		obj.draw(dx,dy)
+		if(DEBUG && usedLayer == 0)obj.debugDraw(dx,dy)
+	}
+	if(usedLayer == 0)ctx.filter = 'opacity(0.2)'
 
-  editlog(dx, dy)
+	//background
+	for(let i=3;i>0;i--){
+		if(usedLayer == i)ctx.filter = 'none'
+		for(let obj of LAYERS[i]) {
+			obj.draw(dx,dy)
+			if(DEBUG && usedLayer == i)obj.debugDraw(dx,dy)
+		}
+		if(usedLayer == i)ctx.filter = 'opacity(0.2)'
+	}
+	ctx.filter = 'none'
+
+
+	editlog(dx, dy)
 
 	if(DEBUG){
 		ctx.strokeStyle = "blue"
@@ -373,4 +367,5 @@ function render(){
 		ctx.strokeText(frameID,20,40)
 		ctx.strokeStyle = "yellow"
 	}
+
 }

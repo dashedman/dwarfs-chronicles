@@ -119,60 +119,75 @@ function initial(){
 	ctx.strokeStyle = "yellow"
 	ctx.imageSmoothingEnabled = false
 
-  let mapBackgrounds = mapStructure["backgrounds"]
-  for(let obj of mapBackgrounds){
-    if(obj.class_type == "sprite"){
-      BACKGROUNDS.push(new Sprite(obj.x, obj.y, obj.width, obj.height, obj.scale, obj.texture_name))
-    }
-  }
+  let mapLayers = mapStructure["layers"]
 
-  let mapLifeless = mapStructure["lifelesses"]
-  for(let obj of mapLifeless){
-    if(obj.class_type == "sprite"){
-      LIFELESSES.push(new Sprite(obj.x, obj.y, obj.width, obj.height, obj.scale, obj.texture_name))
-    }
+	for(let i=1;i<10;i++){
+		LAYERS[i] = new Array()
 
-  }
+		let layerParallax = (i<3)?i-3:( (i>5)?i-5:0 )
 
-  let mapAlives = mapStructure["alives"]
-  for(let obj of mapAlives){
-    let obj = mapAlives[keyObj]
-    if(obj.class_type == "alive"){
-      ALIVES.push(new Alive(obj.x, obj.y, obj.width, obj.height, obj.scale, obj.texture_name))
-    }
-  }
+
+		for(let obj of mapLayers[i]){
+			if(obj.class_type == "sprite"){
+	      LAYERS[i].push(new Sprite(obj.x, obj.y, obj.width, obj.height, obj.scale, obj.texture_name, TYPE_BOX, layerParallax))
+	    }
+		}
+	}
+
 
 	let heroData =  mapStructure["hero"]
-	hero = new Hero(heroData.x, heroData.y, heroData.width, heroData.height, heroData.scale,  heroData.race, 0, heroData.seat_height)
+	hero = new Hero(heroData.x, heroData.y, heroData.width, heroData.height, heroData.scale,  heroData.race, TYPE_BOX, 0, heroData.seat_height)
 
-  console.log("start")
+	LAYERS[0] = new Array()
+	LAYERS[0].push(hero)
+	for(let obj of mapLayers[0]){
+		if(obj.class_type == "alive"){
+      LAYERS[0].push(new Alive(obj.x, obj.y, obj.width, obj.height, obj.scale, obj.texture_name, TYPE_BOX))
+    }
+	}
+
+
+	console.log(LAYERS)
+	start()
+}
+////
+function start(){
+	console.log("start")
 	lastTime = Date.now()
 	frameID = requestAnimationFrame(frame);
 }
-////
-
 //MAIN FUNCTIONS
 function update(dt){
-  hero.update(dt)
-  for(let i=0;i<ALIVES.length;i++)ALIVES[i].update(dt)
-  for(let i=0;i<LIFELESSES.length;i++)LIFELESSES[i].update(dt)
-  for(let i=0;i<BACKGROUNDS.length;i++)BACKGROUNDS[i].update(dt)
+
+	for(let layer of LAYERS){
+		for(let obj of layer){
+			obj.update(dt)
+		}
+	}
 }
 
 function render(){
-	let dx = (canvas.width - hero.width)*0.5 - hero.x
-	let dy = (canvas.height - hero.height)*0.5 - hero.y
+	let dx = (hero.width)*0.5 - hero.x
+	let dy = (hero.height)*0.5 - hero.y
 
 	ctx.clearRect(0,0,canvas.width,canvas.height)
-  //background
-  for(let i=0;i<BACKGROUNDS.length;i++)BACKGROUNDS[i].draw(dx,dy)
 
-  //other entity
-  for(let i=0;i<LIFELESSES.length;i++)LIFELESSES[i].draw(dx,dy)
-  for(let i=0;i<ALIVES.length;i++)ALIVES[i].draw(dx,dy)
+	//foreground
+  for(let i=9;i>=4;i--){
+		for(let obj of LAYERS[i]) obj.draw(dx,dy)
+	}
+
+	//alive
+	for(let obj of LAYERS[0]) obj.draw(dx,dy)
+	hero.draw(dx,dy)
+
+	//background
+	for(let i=3;i>0;i--){
+		for(let obj of LAYERS[i]) obj.draw(dx,dy)
+	}
 
 	//hero
-	hero.draw(dx,dy)
+
 
 	if(DEBUG){
 		ctx.strokeStyle = "blue"

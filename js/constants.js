@@ -5,17 +5,16 @@ const DATA_PATH = "resources/"
 const MAP_PATH = "maps/"
 const DEBUG = true
 const PI = Math.PI
+const PARALLAX_COEFFICIENT = 5
 
 //physics
 const GRAVITY = 1000
 const TIME_BOOSTER = 1 //WARNING!!!
 
 //arrays
-const PRESSED_KEYS = new Array(128)
+const PRESSED_KEYS = new Int32Array(256)
 const ONCE_PRESSED_KEYS = new Set()
-const LIFELESSES = []
-const BACKGROUNDS = []
-const ALIVES = []
+const LAYERS = new Array(10)
 const TEXTURE_LIST = new Map()
 
 /*
