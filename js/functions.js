@@ -80,7 +80,7 @@ function mapToJson(){
     "width":hero.width/hero.s,
     "height":hero.height/hero.s,
     "scale":hero.s,
-    "seat_height":hero.seat_height,
+    "seat_height":hero.seat_height/hero.s,
     "race":hero.source
   }
   return JSON.stringify(jm)
