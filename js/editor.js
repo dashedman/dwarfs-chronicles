@@ -187,7 +187,7 @@ function editlog(dx, dy){
   			let tmpH = Math.max(mouseY,mouseDownY)-tmpY
 
 				let p = parallax_f( (0<usedLayer && usedLayer<3)?usedLayer-3:((usedLayer>5)?usedLayer-5:0 ) )
-				ctx.filter = 'opacity(0.5)'
+				ctx.globalAlpha = 0.5
 				ctx.drawImage(texture_in_use.texture.data,
 											0,
 											0,
@@ -197,11 +197,11 @@ function editlog(dx, dy){
 											(tmpY + tmpH*0.5 - texture_in_use.texture.frameHeight * PIXEL_SCALE * 0.5 + dy - canvas.height*0.5) * p  + canvas.height*0.5,
 											texture_in_use.texture.frameWidth * PIXEL_SCALE * p,
 											texture_in_use.texture.frameHeight * PIXEL_SCALE * p)
-				ctx.filter = 'none'
+				ctx.globalAlpha = 1
 
 				//new physbox
   			ctx.strokeRect(tmpX+dx,tmpY+dy,tmpW,tmpH)
-
+				//lines
 				ctx.strokeStyle = "magenta"
 				ctx.beginPath()
 				ctx.moveTo(tmpX+dx,0)
