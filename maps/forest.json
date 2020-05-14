@@ -6,6 +6,31 @@
       "frames":1,
       "frameSpeed":10
     },
+"background1":{
+      "name":"background_forest_1_11.png",
+      "frames":1,
+      "frameSpeed":10
+    },
+"background2":{
+      "name":"background_forest_1_22.png",
+      "frames":1,
+      "frameSpeed":10
+    },
+"background3":{
+      "name":"background_forest_1_33.png",
+      "frames":1,
+      "frameSpeed":10
+    },
+"background4":{
+      "name":"background_forest_1_44.png",
+      "frames":1,
+      "frameSpeed":10
+ },
+"background5":{
+      "name":"background_forest_1_55.png",
+      "frames":1,
+      "frameSpeed":10
+ },
     "ground":{
       "name":"ground_forest_1.png",
       "frames":1,
