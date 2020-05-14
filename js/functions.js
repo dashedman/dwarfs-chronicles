@@ -36,6 +36,7 @@ function mapToJson(){
     if(x instanceof Alive)return "alive"
   }
 
+  //textures
   let jm = {"textures":{},"layers":[],hero:{}}
   for(let [name,texture] of TEXTURE_LIST){
     jm.textures[name] = { "name":texture.data.src.substring(texture.data.src.lastIndexOf("/")+1),
@@ -43,7 +44,22 @@ function mapToJson(){
                           "frameSpeed":texture.frameSpeed }
   }
 
-  for(let i=0;i<10;i++ ){
+  //alives
+  jm.layers.push(new Array())
+  for(let i=1; i<LAYERS[0].length; i++){
+    let entity = LAYERS[0][i]
+    let class_type = getClassType(entity)
+    jm.layers[i].push( {  "x":entity.x,
+                            "y":entity.y,
+                            "width":entity.width/entity.s,
+                            "height":entity.height/entity.s,
+                            "scale":entity.s,
+                            "texture_name":entity.source,
+                            "class_type":class_type} )
+  }
+
+  //sprites
+  for(let i=1;i<10;i++ ){
     jm.layers.push(new Array())
     for(let entity of LAYERS[i]){
       let class_type = getClassType(entity)
@@ -57,7 +73,7 @@ function mapToJson(){
     }
   }
 
-
+  //hero
   jm.hero = {
     "x":hero.x,
     "y":hero.y,
