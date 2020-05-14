@@ -32,6 +32,7 @@ if(window.innerWidth*9 > window.innerHeight*16){
 //ACTIONS
 PRESSED_KEYS.fill(false)
 
+document.addEventListener("DOMContentLoaded",mapPick,{once:true})
 document.addEventListener('keydown', function(event) {
 	PRESSED_KEYS[event.keyCode] = true
 	ONCE_PRESSED_KEYS.add(event.keyCode)
