@@ -76,6 +76,11 @@
       "frames":3,
       "frameSpeed":10
     },
+    "lights":{
+      "name":"test1.png",
+      "frames":41,
+      "frameSpeed":10
+    },
     "dwarf_seat":{
       "name":"dwarf_seat.png",
       "frames":1,
@@ -107,6 +112,14 @@
         "y":297,
         "width":100,
         "height":11
+      },
+{
+        "texture_name":"lights",
+        "class_type":"sprite",
+        "x":200,
+        "y":297,
+        "width":60,
+        "height":60
       },
       {
         "texture_name":"ground",
